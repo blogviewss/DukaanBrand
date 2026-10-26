@@ -10,6 +10,7 @@ interface CanvasRendererProps {
   format: CanvasFormat;
   isPro: boolean;
   language: Language;
+  watermarkText?: string;
   onOpenProModal: () => void;
 }
 
@@ -19,6 +20,7 @@ export const CanvasRenderer: React.FC<CanvasRendererProps> = ({
   format,
   isPro,
   language,
+  watermarkText,
   onOpenProModal,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -297,7 +299,7 @@ export const CanvasRenderer: React.FC<CanvasRendererProps> = ({
         context.fillStyle = '#ea580c';
         context.font = 'bold 22px "Plus Jakarta Sans", sans-serif';
         context.textAlign = 'center';
-        context.fillText('⚡ अपनी दुकान का फ्री स्टेटस बनाएं: DukaanBrand.in', w / 2, watermarkY);
+        context.fillText(watermarkText || '⚡ अपनी दुकान का फ्री स्टेटस बनाएं: DukaanBrand.in', w / 2, watermarkY);
       } else {
         // Pro VIP badge
         context.fillStyle = '#16a34a';

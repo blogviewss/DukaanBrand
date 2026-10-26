@@ -9,6 +9,7 @@ interface DukaanHeaderProps {
   onOpenProModal: () => void;
   onOpenPlaybook: () => void;
   onOpenHostingGuide: () => void;
+  onOpenAdmin: () => void;
 }
 
 export const DukaanHeader: React.FC<DukaanHeaderProps> = ({
@@ -18,6 +19,7 @@ export const DukaanHeader: React.FC<DukaanHeaderProps> = ({
   onOpenProModal,
   onOpenPlaybook,
   onOpenHostingGuide,
+  onOpenAdmin,
 }) => {
   return (
     <header className="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 text-white">
@@ -50,21 +52,21 @@ export const DukaanHeader: React.FC<DukaanHeaderProps> = ({
             {/* Live Hosting Guide Button */}
             <button
               onClick={onOpenHostingGuide}
-              className="px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-sm"
+              className="px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-sm hidden sm:flex"
             >
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>{language === 'hinglish' ? '🌐 लाइव लिंक व होस्टिंग' : 'Live URL & Host'}</span>
+              <span>{language === 'hinglish' ? '🌐 लाइव लिंक' : 'Live URL'}</span>
             </button>
 
-            {/* Business Playbook Button */}
+            {/* Owner Admin Portal Button */}
             <button
-              onClick={onOpenPlaybook}
-              className="px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-colors cursor-pointer hidden md:flex"
+              onClick={onOpenAdmin}
+              className="px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs sm:text-sm font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+              title="मालिक एडमिन पोर्टल (Owner Login)"
             >
-              <TrendingUp className="w-4 h-4 text-amber-400" />
-              <span>
-                {language === 'hinglish' ? 'कमाई गाइड' : 'Earn Guide'}
-              </span>
+              <span>🔐</span>
+              <span className="hidden md:inline">{language === 'hinglish' ? 'मालिक एडमिन' : 'Owner Admin'}</span>
+              <span className="md:hidden">एडमिन</span>
             </button>
 
             {/* Pro Status / Unlock Button */}
