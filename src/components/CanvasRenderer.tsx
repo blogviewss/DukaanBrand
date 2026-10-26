@@ -11,6 +11,10 @@ interface CanvasRendererProps {
   isPro: boolean;
   language: Language;
   watermarkText?: string;
+  customHeader?: string;
+  customQuote?: string;
+  customSubQuote?: string;
+  customAccent?: string;
   onOpenProModal: () => void;
   onShareSuccess?: () => void;
 }
@@ -22,6 +26,10 @@ export const CanvasRenderer: React.FC<CanvasRendererProps> = ({
   isPro,
   language,
   watermarkText,
+  customHeader,
+  customQuote,
+  customSubQuote,
+  customAccent,
   onOpenProModal,
   onShareSuccess,
 }) => {
@@ -102,6 +110,11 @@ export const CanvasRenderer: React.FC<CanvasRendererProps> = ({
       logo: HTMLImageElement | null,
       qr: HTMLImageElement | null
     ) {
+      const activeAccent = customAccent || template.accentColor;
+      const headerText = customHeader || (language === 'hinglish' ? template.headerTagHindi : template.headerTagEnglish);
+      const quoteToDisplay = customQuote || (language === 'hinglish' ? template.mainQuoteHindi : template.mainQuoteEnglish);
+      const subQuoteToDisplay = customSubQuote || (language === 'hinglish' ? template.subQuoteHindi : template.subQuoteEnglish);
+
       // 1. Rich Background Gradient
       const grad = context.createLinearGradient(0, 0, w, h);
       grad.addColorStop(0, template.bgColors[0]);
@@ -124,7 +137,7 @@ export const CanvasRenderer: React.FC<CanvasRendererProps> = ({
 
       // 3. Ornate Golden Border Frame
       context.save();
-      context.strokeStyle = template.accentColor;
+      context.strokeStyle = activeAccent;
       context.lineWidth = 4;
       context.strokeRect(36, 36, w - 72, h - 72);
 
@@ -135,11 +148,11 @@ export const CanvasRenderer: React.FC<CanvasRendererProps> = ({
 
       // Corner traditional motifs
       const drawCorner = (x: number, y: number) => {
-        context.fillStyle = template.accentColor;
+        context.fillStyle = activeAccent;
         context.fillRect(x - 6, y - 6, 12, 12);
         context.beginPath();
         context.arc(x, y, 16, 0, Math.PI * 2);
-        context.strokeStyle = template.accentColor;
+        context.strokeStyle = activeAccent;
         context.lineWidth = 2;
         context.stroke();
       };
@@ -157,19 +170,15 @@ export const CanvasRenderer: React.FC<CanvasRendererProps> = ({
       context.beginPath();
       context.roundRect(110, bannerY, w - 220, bannerH, 18);
       context.fill();
-      context.strokeStyle = template.accentColor;
+      context.strokeStyle = activeAccent;
       context.lineWidth = 2.5;
       context.stroke();
 
-      context.fillStyle = template.accentColor;
+      context.fillStyle = activeAccent;
       context.font = 'bold 34px "Plus Jakarta Sans", sans-serif';
       context.textAlign = 'center';
       context.textBaseline = 'middle';
-      context.fillText(
-        language === 'hinglish' ? template.headerTagHindi : template.headerTagEnglish,
-        w / 2,
-        bannerY + bannerH / 2
-      );
+      context.fillText(headerText, w / 2, bannerY + bannerH / 2);
       context.restore();
 
       // 5. PRO FEATURE: Gold Verified Merchant Stamp (If Pro or Verified enabled)
@@ -196,7 +205,7 @@ export const CanvasRenderer: React.FC<CanvasRendererProps> = ({
       context.arc(w / 2, iconY, format === 'story' ? 95 : 75, 0, Math.PI * 2);
       context.fillStyle = 'rgba(255, 255, 255, 0.12)';
       context.fill();
-      context.strokeStyle = template.accentColor;
+      context.strokeStyle = activeAccent;
       context.lineWidth = 4;
       context.stroke();
 
@@ -207,7 +216,7 @@ export const CanvasRenderer: React.FC<CanvasRendererProps> = ({
       context.fillText(template.ornamentSymbol, w / 2, iconY);
       context.restore();
 
-      // 7. Main Quote Text (Hindi/English)
+      // 7. Main Quote Text (Hindi/English / Custom)
       const textStartY = format === 'story' ? 510 : 340;
       const maxTextWidth = w - 200;
       const lineHeight = format === 'story' ? 66 : 50;
@@ -237,13 +246,11 @@ export const CanvasRenderer: React.FC<CanvasRendererProps> = ({
         return y + lHeight;
       };
 
-      const quoteToDisplay = language === 'hinglish' ? template.mainQuoteHindi : template.mainQuoteEnglish;
       const nextY = wrapText(quoteToDisplay, w / 2, textStartY, maxTextWidth, lineHeight);
 
       // Sub-quote / Blessing
-      context.fillStyle = template.accentColor;
+      context.fillStyle = activeAccent;
       context.font = format === 'story' ? '600 32px "Plus Jakarta Sans", sans-serif' : '600 26px "Plus Jakarta Sans", sans-serif';
-      const subQuoteToDisplay = language === 'hinglish' ? template.subQuoteHindi : template.subQuoteEnglish;
       wrapText(subQuoteToDisplay, w / 2, nextY + 12, maxTextWidth, format === 'story' ? 44 : 34);
       context.restore();
 
@@ -408,7 +415,7 @@ export const CanvasRenderer: React.FC<CanvasRendererProps> = ({
 
       context.restore();
     }
-  }, [profile, template, format, isPro, language, watermarkText]);
+  }, [profile, template, format, isPro, language, watermarkText, customHeader, customQuote, customSubQuote, customAccent]);
 
   // Download high-res PNG/JPG
   const handleDownload = () => {
@@ -439,10 +446,10 @@ export const CanvasRenderer: React.FC<CanvasRendererProps> = ({
 
     setShareStatus('शेयरिंग तैयार हो रही है...');
 
-    const greeting = language === 'hinglish' ? template.mainQuoteHindi : template.mainQuoteEnglish;
+    const greeting = customQuote || (language === 'hinglish' ? template.mainQuoteHindi : template.mainQuoteEnglish);
     const shareText = `*${profile.shopName || 'हमारी दुकान'}* की ओर से हार्दिक शुभकामनाएं!\n\n${greeting}\n\n${
       profile.specialOffer ? `🔥 विशेष ऑफर: ${profile.specialOffer}\n` : ''
-    }📞 संपर्क / ऑर्डर: ${profile.phone || ''}\n📍 पता: ${profile.city || ''}\n\n_10 सेकंड में अपनी दुकान का फ्री स्टेटस बनाएं: DukaanBrand_`;
+    }📞 संपर्क / ऑर्डर: ${profile.phone || ''}\n📍 पता: ${profile.city || ''}\n\n_10 सेकंड में अपनी दुकान का फ्री स्टेटस बनाएं: https://dukaan-brand.vercel.app_`;
 
     try {
       // 1. Convert canvas to JPEG blob

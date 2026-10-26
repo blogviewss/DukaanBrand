@@ -68,11 +68,38 @@ export const DukaanHeader: React.FC<DukaanHeaderProps> = ({
 
           {/* Right Action Controls */}
           <div className="flex items-center gap-2">
+            {/* Language Switcher Pill */}
+            <div className="bg-slate-950 p-0.5 rounded-xl border border-slate-800 flex items-center">
+              <button
+                type="button"
+                onClick={() => onLanguageChange('hinglish')}
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  language === 'hinglish'
+                    ? 'bg-amber-500 text-slate-950 shadow-sm'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                हिन्दी
+              </button>
+              <button
+                type="button"
+                onClick={() => onLanguageChange('english')}
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  language === 'english'
+                    ? 'bg-amber-500 text-slate-950 shadow-sm'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                English
+              </button>
+            </div>
+
             {/* Pro Status / Unlock Button */}
             {isPro ? (
               <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-black">
                 <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                <span>VIP Pro एक्टिव</span>
+                <span className="hidden sm:inline">VIP Pro एक्टिव</span>
+                <span className="sm:hidden">VIP</span>
               </div>
             ) : (
               <button

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { AdminConfig, PaymentRecord, SecurityAuditLog, DynamicVipToken } from '../types/admin';
 import { Language } from '../types';
 import { AdminAnalytics } from './AdminAnalytics';
+import { ProfitPotentialCalculator } from './ProfitPotentialCalculator';
+import { BroadcastExportModal } from './BroadcastExportModal';
 import { 
   ShieldCheck, 
   Users, 
@@ -30,7 +32,9 @@ import {
   HelpCircle,
   FileText,
   Copy,
-  Check
+  Check,
+  TrendingUp,
+  FileSpreadsheet
 } from 'lucide-react';
 
 interface AdminPortalProps {
@@ -49,7 +53,7 @@ interface AdminPortalProps {
   language: Language;
 }
 
-type AdminTab = 'analytics' | 'upi' | 'subscribers' | 'vip_generator' | 'audit_log' | 'security';
+type AdminTab = 'analytics' | 'profit_calculator' | 'upi' | 'vip_generator' | 'subscribers' | 'audit_log' | 'security';
 
 export const AdminPortal: React.FC<AdminPortalProps> = ({
   config,
@@ -72,6 +76,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   const [newPhone, setNewPhone] = useState('');
   const [newShopName, setNewShopName] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showBroadcastModal, setShowBroadcastModal] = useState(false);
 
   // New Password State
   const [newPassword, setNewPassword] = useState('');

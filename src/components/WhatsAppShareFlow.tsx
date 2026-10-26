@@ -1,72 +1,137 @@
 import React, { useState, useMemo } from 'react';
 import { ShopProfile } from '../types/dukaan';
 import { Template } from '../data/templates';
-import { MessageSquare, Send, Copy, Check, Sparkles, ExternalLink, RefreshCw, ShoppingBag, Truck, Gift } from 'lucide-react';
+import { Language } from '../types';
+import { 
+  MessageSquare, 
+  Send, 
+  Copy, 
+  Check, 
+  Sparkles, 
+  ExternalLink, 
+  ShoppingBag, 
+  Truck, 
+  Gift, 
+  Globe, 
+  Info,
+  CheckCircle2
+} from 'lucide-react';
 
 interface WhatsAppShareFlowProps {
   profile: ShopProfile;
   template: Template;
+  language?: Language;
+  customHeader?: string;
+  customQuote?: string;
   onShareSuccess?: () => void;
 }
 
 export const WhatsAppShareFlow: React.FC<WhatsAppShareFlowProps> = ({
   profile,
   template,
+  language = 'hinglish',
+  customHeader,
+  customQuote,
   onShareSuccess,
 }) => {
   const [offerType, setOfferType] = useState<'sale' | 'stock' | 'delivery' | 'festival'>('sale');
   const [copied, setCopied] = useState<boolean>(false);
   const [customNote, setCustomNote] = useState<string>('');
   const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [showDomainSettings, setShowDomainSettings] = useState<boolean>(false);
+
+  // Default public domain that never asks customers for Google sign-in
+  const DEFAULT_PUBLIC_DOMAIN = 'https://dukaan-brand.vercel.app';
+  const [customDomain, setCustomDomain] = useState<string>(DEFAULT_PUBLIC_DOMAIN);
+
+  const isHindi = language === 'hinglish';
+
+  // Smart domain resolver: replaces private ais-dev-* or localhost with the public production domain
+  const publicBaseDomain = useMemo(() => {
+    if (customDomain.trim()) return customDomain.trim().replace(/\/$/, '');
+    if (typeof window !== 'undefined') {
+      const origin = window.location.origin;
+      // If dev instance (Google login required), fallback to public Vercel domain
+      if (origin.includes('ais-dev-') || origin.includes('localhost') || origin.includes('127.0.0.1')) {
+        return DEFAULT_PUBLIC_DOMAIN;
+      }
+      return origin;
+    }
+    return DEFAULT_PUBLIC_DOMAIN;
+  }, [customDomain]);
 
   // Generate web link to view the poster / store
   const posterWebLink = useMemo(() => {
-    if (typeof window !== 'undefined') {
-      const origin = window.location.origin;
-      const params = new URLSearchParams({
-        shop: profile.shopName || '',
-        phone: profile.phone || '',
-        offer: template.titleHindi || '',
-      });
-      return `${origin}/?${params.toString()}`;
-    }
-    return 'https://dukaanbrand.vercel.app';
-  }, [profile.shopName, profile.phone, template.titleHindi]);
+    const params = new URLSearchParams({
+      shop: profile.shopName || '',
+      phone: profile.phone || '',
+      offer: customHeader || (isHindi ? template.titleHindi : template.titleEnglish) || '',
+    });
+    return `${publicBaseDomain}/?${params.toString()}`;
+  }, [publicBaseDomain, profile.shopName, profile.phone, customHeader, isHindi, template.titleHindi, template.titleEnglish]);
 
   // Construct automated pre-filled WhatsApp message
   const generatedMessage = useMemo(() => {
-    const shop = profile.shopName || 'हमारी दुकान';
-    const city = profile.city ? `\n📍 पता: ${profile.city}` : '';
-    const phone = profile.phone ? `\n📞 संपर्क / WhatsApp ऑर्डर: ${profile.phone}` : '';
-    const upi = profile.showUpiQr && profile.upiId ? `\n💳 ऑनलाइन पेमेंट (UPI): ${profile.upiId}` : '';
-    const note = customNote.trim() ? `\n\n📌 विशेष सूचना: ${customNote.trim()}` : '';
-    const specialOfferLine = profile.specialOffer ? `\n🎁 विशेष छूट: ${profile.specialOffer}` : '';
+    const shop = profile.shopName || (isHindi ? 'हमारी दुकान' : 'Our Store');
+    const city = profile.city ? `\n📍 ${isHindi ? 'पता' : 'Address'}: ${profile.city}` : '';
+    const phone = profile.phone ? `\n📞 ${isHindi ? 'संपर्क / WhatsApp ऑर्डर' : 'WhatsApp Order / Call'}: ${profile.phone}` : '';
+    const upi = profile.showUpiQr && profile.upiId ? `\n💳 ${isHindi ? 'ऑनलाइन पेमेंट (UPI)' : 'Online Payment (UPI)'}: ${profile.upiId}` : '';
+    const note = customNote.trim() ? `\n\n📌 ${isHindi ? 'विशेष सूचना' : 'Note'}: ${customNote.trim()}` : '';
+    const specialOfferLine = profile.specialOffer ? `\n🎁 ${isHindi ? 'विशेष छूट' : 'Special Offer'}: ${profile.specialOffer}` : '';
+
+    const effectiveTitle = customHeader || (isHindi ? template.titleHindi : template.titleEnglish);
+    const effectiveQuote = customQuote || (isHindi ? template.mainQuoteHindi : template.mainQuoteEnglish);
 
     let intro = '';
     let body = '';
 
-    if (offerType === 'sale') {
-      intro = `🛍️ *${shop} का स्पेशल डिस्काउंट ऑफर!* 🔥`;
-      body = `✨ *${template.titleHindi || 'धमाका सेल'}*\n🏷️ ${template.mainQuoteHindi || 'सर्वोत्तम क्वालिटी और सबसे कम दाम!'}${specialOfferLine}\n⚡ सीमित समय के लिए भारी छूट उपलब्ध है।`;
-    } else if (offerType === 'stock') {
-      intro = `📦 *${shop} पर नया फ्रेश स्टॉक आ गया है!* 🌟`;
-      body = `✨ *ताज़ा माल व नया कलेक्शन!*\n🏷️ ${template.titleHindi || 'प्रीमियम क्वालिटी में नया सामान उपलब्ध'}\n🛒 आज ही दुकान पर पधारें या घर बैठे मंगवाएं।`;
-    } else if (offerType === 'delivery') {
-      intro = `🚚 *${shop} की फ्री होम डिलीवरी सेवा!* 📦`;
-      body = `✨ *घर बैठे सामान मंगाएं!*\n🏷️ WhatsApp पर सामान की लिस्ट भेजें, सामान सीधे आपके दरवाजे पर।\n🛵 डिलीवरी एकदम सुरक्षित व तेज़।`;
-    } else {
-      intro = `🪔 *${shop} की ओर से हार्दिक शुभकामनाएं!* 🎁`;
-      body = `✨ *त्योहार स्पेशल बचत ऑफर!*\n🏷️ ${template.titleHindi || 'हर खरीदारी पर विशेष उपहार और छूट'}\n🎉 अपने परिवार के साथ खुशियाँ मनाएं।`;
-    }
+    if (isHindi) {
+      if (offerType === 'sale') {
+        intro = `🛍️ *${shop} का स्पेशल डिस्काउंट ऑफर!* 🔥`;
+        body = `✨ *${effectiveTitle || 'धमाका सेल'}*\n🏷️ ${effectiveQuote || 'सर्वोत्तम क्वालिटी और सबसे कम दाम!'}${specialOfferLine}\n⚡ सीमित समय के लिए भारी छूट उपलब्ध है।`;
+      } else if (offerType === 'stock') {
+        intro = `📦 *${shop} पर नया फ्रेश स्टॉक आ गया है!* 🌟`;
+        body = `✨ *ताज़ा माल व नया कलेक्शन!*\n🏷️ ${effectiveTitle || 'प्रीमियम क्वालिटी में नया सामान उपलब्ध'}\n🛒 आज ही दुकान पर पधारें या घर बैठे मंगवाएं।`;
+      } else if (offerType === 'delivery') {
+        intro = `🚚 *${shop} की फ्री होम डिलीवरी सेवा!* 📦`;
+        body = `✨ *घर बैठे सामान मंगाएं!*\n🏷️ WhatsApp पर सामान की लिस्ट भेजें, सामान सीधे आपके दरवाजे पर।\n🛵 डिलीवरी एकदम सुरक्षित व तेज़।`;
+      } else {
+        intro = `🪔 *${shop} की ओर से हार्दिक शुभकामनाएं!* 🎁`;
+        body = `✨ *त्योहार स्पेशल बचत ऑफर!*\n🏷️ ${effectiveTitle || 'हर खरीदारी पर विशेष उपहार और छूट'}\n🎉 अपने परिवार के साथ खुशियाँ मनाएं।`;
+      }
 
-    return `${intro}
+      return `${intro}
 ${body}${city}${phone}${upi}${note}
 
-👉 *हमारा ऑनलाइन डिजिटल पोस्टर व रेट लिस्ट यहाँ देखें:*
+👉 *हमारा ऑनलाइन डिजिटल पोस्टर व रेट लिस्ट यहाँ देखें (बिना किसी लॉगिन के):*
 ${posterWebLink}
 
 🙏 _आपकी संतुष्टि ही हमारा विश्वास है! धन्यवाद!_`;
-  }, [profile, template, offerType, customNote, posterWebLink]);
+    } else {
+      // English version
+      if (offerType === 'sale') {
+        intro = `🛍️ *Special Discount Offer from ${shop}!* 🔥`;
+        body = `✨ *${effectiveTitle || 'Mega Sale'}*\n🏷️ ${effectiveQuote || 'Best Quality at Lowest Prices!'}${specialOfferLine}\n⚡ Heavy discounts available for a limited time.`;
+      } else if (offerType === 'stock') {
+        intro = `📦 *Fresh New Stock Arrived at ${shop}!* 🌟`;
+        body = `✨ *Fresh Arrivals & New Collection!*\n🏷️ ${effectiveTitle || 'Premium quality products available'}\n🛒 Visit our store today or order from home.`;
+      } else if (offerType === 'delivery') {
+        intro = `🚚 *Free Home Delivery Service by ${shop}!* 📦`;
+        body = `✨ *Order from the comfort of your home!*\n🏷️ Send your shopping list on WhatsApp, delivery right to your door.\n🛵 Safe, contactless, and quick delivery.`;
+      } else {
+        intro = `🪔 *Warm Greetings & Best Wishes from ${shop}!* 🎁`;
+        body = `✨ *Festive Savings Special!*\n🏷️ ${effectiveTitle || 'Special gifts and discounts on every purchase'}\n🎉 Celebrate happiness with your family.`;
+      }
+
+      return `${intro}
+${body}${city}${phone}${upi}${note}
+
+👉 *View our Digital Poster & Store Catalog here:*
+${posterWebLink}
+
+🙏 _Your satisfaction is our pride! Thank you!_`;
+    }
+  }, [profile, template, offerType, customNote, posterWebLink, isHindi, customHeader, customQuote]);
 
   // Handle Send to WhatsApp
   const handleSendWhatsApp = () => {
@@ -99,17 +164,65 @@ ${posterWebLink}
           </div>
           <div>
             <h3 className="text-sm sm:text-base font-black text-white flex items-center gap-1.5">
-              <span>ऑटोमैटिक WhatsApp संदेश जनरेटर</span>
+              <span>{isHindi ? 'ऑटोमैटिक WhatsApp संदेश जनरेटर' : 'Automated WhatsApp Message'}</span>
               <span className="bg-emerald-500/20 text-emerald-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-500/30">
                 1-क्लिक शेयर
               </span>
             </h3>
             <p className="text-xs text-slate-400">
-              दुकान का नाम, ऑफर और पोस्टर लिंक पहले से तैयार हैं। सीधे ग्राहकों को भेजें।
+              {isHindi
+                ? 'दुकान का नाम, ऑफर और सार्वजनिक पोस्टर लिंक पहले से तैयार हैं।'
+                : 'Pre-filled with shop name, verified public link, and current offer.'}
             </p>
           </div>
         </div>
+
+        {/* Public Domain Badge / Switcher */}
+        <button
+          type="button"
+          onClick={() => setShowDomainSettings(!showDomainSettings)}
+          className="text-[11px] text-sky-400 hover:text-sky-300 bg-sky-500/10 border border-sky-500/20 px-2.5 py-1 rounded-xl flex items-center gap-1.5 cursor-pointer"
+        >
+          <Globe className="w-3.5 h-3.5 text-sky-400" />
+          <span>{publicBaseDomain.replace('https://', '')}</span>
+          <span className="text-[10px] text-emerald-400 font-bold">✓ पब्लिक</span>
+        </button>
       </div>
+
+      {/* Domain explanation / settings box */}
+      {showDomainSettings && (
+        <div className="p-3 rounded-2xl bg-slate-950 border border-sky-500/40 text-xs text-slate-300 space-y-2 animate-fadeIn">
+          <div className="flex items-start gap-2">
+            <Info className="w-4 h-4 text-sky-400 shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              <strong className="text-white block font-bold">
+                {isHindi ? 'सार्वजनिक लिंक (Public Link Guarantee):' : 'Public Link Guarantee:'}
+              </strong>
+              <p className="text-[11px] text-slate-400 leading-relaxed">
+                {isHindi
+                  ? 'ais-dev-... वाला लिंक केवल आपके Google खाते से खुलता है। ग्राहकों को भेजने के लिए हम हमेशा DukaanBrand Vercel लिंक का उपयोग करते हैं, जिससे कोई भी ग्राहक बिना किसी पासवर्ड या लॉगिन के तुरंत पोस्टर देख सके!'
+                  : 'The ais-dev link requires your Google login. We use the public Vercel domain so any customer can open your poster without needing any login!'}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 pt-1">
+            <input
+              type="text"
+              value={customDomain}
+              onChange={(e) => setCustomDomain(e.target.value)}
+              placeholder="https://dukaan-brand.vercel.app"
+              className="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-sky-400 font-mono"
+            />
+            <button
+              type="button"
+              onClick={() => setCustomDomain(DEFAULT_PUBLIC_DOMAIN)}
+              className="text-[11px] text-amber-400 hover:underline font-bold px-2"
+            >
+              रीसेट
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Offer Type Selector Buttons */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -123,7 +236,7 @@ ${posterWebLink}
           }`}
         >
           <Sparkles className="w-3.5 h-3.5" />
-          <span>🔥 महा डिस्काउंट</span>
+          <span>{isHindi ? '🔥 महा डिस्काउंट' : '🔥 Big Discount'}</span>
         </button>
 
         <button
@@ -136,7 +249,7 @@ ${posterWebLink}
           }`}
         >
           <ShoppingBag className="w-3.5 h-3.5" />
-          <span>📦 नया स्टॉक</span>
+          <span>{isHindi ? '📦 नया स्टॉक' : '📦 New Stock'}</span>
         </button>
 
         <button
@@ -149,7 +262,7 @@ ${posterWebLink}
           }`}
         >
           <Truck className="w-3.5 h-3.5" />
-          <span>🚚 फ्री डिलीवरी</span>
+          <span>{isHindi ? '🚚 फ्री डिलीवरी' : '🚚 Free Delivery'}</span>
         </button>
 
         <button
@@ -162,33 +275,36 @@ ${posterWebLink}
           }`}
         >
           <Gift className="w-3.5 h-3.5" />
-          <span>🪔 पर्व/त्योहार</span>
+          <span>{isHindi ? '🪔 पर्व/त्योहार' : '🪔 Festive'}</span>
         </button>
       </div>
 
       {/* Message Preview Box (Looks like WhatsApp Chat Bubble) */}
       <div className="relative rounded-2xl bg-[#0b141a] border border-emerald-900/40 p-3 sm:p-4 text-slate-200 text-xs sm:text-sm font-sans leading-relaxed shadow-inner">
         <div className="text-[10px] uppercase tracking-wider font-bold text-emerald-400 mb-1.5 flex items-center justify-between">
-          <span>WhatsApp संदेश प्रीव्यू (Customer View)</span>
+          <span className="flex items-center gap-1.5">
+            <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+            <span>{isHindi ? 'WhatsApp संदेश प्रीव्यू (Customer View)' : 'WhatsApp Message Preview'}</span>
+          </span>
           <button
             type="button"
             onClick={() => setIsEditing(!isEditing)}
             className="text-amber-400 hover:text-amber-300 font-semibold cursor-pointer underline text-[11px]"
           >
-            {isEditing ? '✓ हो गया' : '✏️ अतिरिक्त रेट या लाइन जोड़ें'}
+            {isEditing ? (isHindi ? '✓ हो गया' : 'Done') : (isHindi ? '✏️ अतिरिक्त रेट या लाइन जोड़ें' : '✏️ Add Custom Line')}
           </button>
         </div>
 
         {isEditing && (
           <div className="mb-2 p-2 rounded-xl bg-slate-900 border border-slate-700 animate-fadeIn">
             <label className="block text-[11px] text-slate-300 mb-1 font-bold">
-              अतिरिक्त लाइन (जैसे: चीनी ₹42/kg या शाम 8 बजे तक खुला है):
+              {isHindi ? 'अतिरिक्त लाइन (जैसे: चीनी ₹42/kg या शाम 8 बजे तक खुला है):' : 'Add custom note (e.g. Open till 9 PM or Rice ₹45/kg):'}
             </label>
             <input
               type="text"
               value={customNote}
               onChange={(e) => setCustomNote(e.target.value)}
-              placeholder="उदा. आज शाम 7 बजे तक ही मान्य..."
+              placeholder={isHindi ? 'उदा. आज शाम 7 बजे तक ही मान्य...' : 'e.g. Valid today only...'}
               className="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-400"
             />
           </div>
@@ -207,7 +323,7 @@ ${posterWebLink}
           className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-green-500 hover:from-emerald-500 hover:to-green-400 text-white font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30 active:scale-98 transition-all cursor-pointer border border-emerald-400/40"
         >
           <Send className="w-4 h-4 text-white shrink-0" />
-          <span>WhatsApp पर तुरंत भेजें (1-Click)</span>
+          <span>{isHindi ? 'WhatsApp पर तुरंत भेजें (1-Click)' : 'Send to WhatsApp (1-Click)'}</span>
         </button>
 
         <button
@@ -218,12 +334,12 @@ ${posterWebLink}
           {copied ? (
             <>
               <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span className="text-emerald-400">✓ संदेश कॉपी हो गया!</span>
+              <span className="text-emerald-400">{isHindi ? '✓ संदेश कॉपी हो गया!' : '✓ Message Copied!'}</span>
             </>
           ) : (
             <>
               <Copy className="w-4 h-4 text-amber-400 shrink-0" />
-              <span>संदेश कॉपी करें (Copy Text)</span>
+              <span>{isHindi ? 'संदेश कॉपी करें (Copy Text)' : 'Copy Message Text'}</span>
             </>
           )}
         </button>
