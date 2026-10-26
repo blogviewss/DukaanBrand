@@ -11,6 +11,8 @@ import { ProCheckoutModal } from './components/ProCheckoutModal';
 import { AdminPortal } from './components/AdminPortal';
 import { SiteAccessGatekeeper } from './components/SiteAccessGatekeeper';
 import { SalesTipsCard } from './components/SalesTipsCard';
+import { DailyGoalTracker } from './components/DailyGoalTracker';
+import { WhatsAppShareFlow } from './components/WhatsAppShareFlow';
 import { 
   Sparkles, 
   Crown, 
@@ -42,6 +44,32 @@ export default function App() {
   const [isSiteUnlocked, setIsSiteUnlocked] = useState<boolean>(() => {
     return localStorage.getItem('dukaan_site_unlocked') === 'true';
   });
+
+  // Daily Sales & Share Goal State (Auto-resets on new day)
+  const [dailyGoalCount, setDailyGoalCount] = useState<number>(() => {
+    const today = new Date().toISOString().slice(0, 10);
+    const savedDate = localStorage.getItem('dukaan_goal_date');
+    if (savedDate !== today) {
+      localStorage.setItem('dukaan_goal_date', today);
+      localStorage.setItem('dukaan_goal_count', '0');
+      return 0;
+    }
+    const savedCount = localStorage.getItem('dukaan_goal_count');
+    return savedCount ? parseInt(savedCount, 10) || 0 : 0;
+  });
+
+  const handleIncrementGoal = useCallback(() => {
+    setDailyGoalCount((prev) => {
+      const next = prev + 1;
+      localStorage.setItem('dukaan_goal_count', next.toString());
+      return next;
+    });
+  }, []);
+
+  const handleResetGoal = useCallback(() => {
+    setDailyGoalCount(0);
+    localStorage.setItem('dukaan_goal_count', '0');
+  }, []);
 
   // Admin Config with LocalStorage Persistence
   const [adminConfig, setAdminConfig] = useState<AdminConfig>(() => {
@@ -500,6 +528,13 @@ export default function App() {
         {/* Daily Shop Sales Tip Banner (दुकानदार कमाई टिप) */}
         <SalesTipsCard shopName={profile.shopName} />
 
+        {/* Daily Sales & Share Goal Tracker (दुकानदार डेली शेयर लक्ष्य) */}
+        <DailyGoalTracker
+          currentCount={dailyGoalCount}
+          onIncrement={handleIncrementGoal}
+          onReset={handleResetGoal}
+        />
+
         {/* Mobile Navigation Tabs (Super clear 4 buttons for illiterate/ordinary users) */}
         <div className="block lg:hidden">
           <div className="grid grid-cols-4 gap-1 p-1 bg-slate-900 border border-slate-800 rounded-2xl shadow-lg text-[11px] font-black">
@@ -561,7 +596,7 @@ export default function App() {
         <div className="block lg:hidden">
           {/* Tab 1: Live Poster Preview Screen (Immediate satisfaction!) */}
           {mobileTab === 'preview' && (
-            <div className="space-y-3 animate-fadeIn">
+            <div className="space-y-4 animate-fadeIn">
               <div className="flex items-center justify-between px-1">
                 <span className="text-xs font-black text-amber-300 flex items-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5 text-amber-400" />
@@ -580,6 +615,14 @@ export default function App() {
                 watermarkText={adminConfig.watermarkText}
                 language={language}
                 onOpenProModal={() => setIsProModalOpen(true)}
+                onShareSuccess={handleIncrementGoal}
+              />
+
+              {/* Automated WhatsApp Message Flow (1-Click Share) */}
+              <WhatsAppShareFlow
+                profile={profile}
+                template={selectedTemplate}
+                onShareSuccess={handleIncrementGoal}
               />
 
               {/* Quick shortcut buttons beneath poster */}
@@ -795,6 +838,14 @@ export default function App() {
               watermarkText={adminConfig.watermarkText}
               language={language}
               onOpenProModal={() => setIsProModalOpen(true)}
+              onShareSuccess={handleIncrementGoal}
+            />
+
+            {/* Automated WhatsApp Message Flow (1-Click Share) */}
+            <WhatsAppShareFlow
+              profile={profile}
+              template={selectedTemplate}
+              onShareSuccess={handleIncrementGoal}
             />
           </div>
         </div>

@@ -12,6 +12,7 @@ interface CanvasRendererProps {
   language: Language;
   watermarkText?: string;
   onOpenProModal: () => void;
+  onShareSuccess?: () => void;
 }
 
 export const CanvasRenderer: React.FC<CanvasRendererProps> = ({
@@ -22,6 +23,7 @@ export const CanvasRenderer: React.FC<CanvasRendererProps> = ({
   language,
   watermarkText,
   onOpenProModal,
+  onShareSuccess,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -423,6 +425,7 @@ export const CanvasRenderer: React.FC<CanvasRendererProps> = ({
 
       setIsDownloading(false);
       setDownloadSuccess(true);
+      onShareSuccess?.();
       setTimeout(() => setDownloadSuccess(false), 5000);
     }, 200);
   };
@@ -462,6 +465,7 @@ export const CanvasRenderer: React.FC<CanvasRendererProps> = ({
           files: [file],
         });
         setShareStatus('✓ WhatsApp पर सफलतापूर्वक शेयर हुआ!');
+        onShareSuccess?.();
         setTimeout(() => setShareStatus(null), 4000);
         return;
       }
@@ -476,6 +480,7 @@ export const CanvasRenderer: React.FC<CanvasRendererProps> = ({
       window.open(waUrl, '_blank');
 
       setShareStatus('✓ पोस्टर डाउनलोड हुआ और WhatsApp खुल गया!');
+      onShareSuccess?.();
       setTimeout(() => setShareStatus(null), 5000);
     } catch (err: unknown) {
       // User cancelled share dialog or permission denied
@@ -488,6 +493,7 @@ export const CanvasRenderer: React.FC<CanvasRendererProps> = ({
       const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
       window.open(waUrl, '_blank');
       setShareStatus('✓ WhatsApp चैट खुल गई है!');
+      onShareSuccess?.();
       setTimeout(() => setShareStatus(null), 4000);
     }
   };
