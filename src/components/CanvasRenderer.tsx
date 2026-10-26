@@ -427,34 +427,69 @@ export const CanvasRenderer: React.FC<CanvasRendererProps> = ({
     }, 200);
   };
 
-  // WhatsApp share
+  const [shareStatus, setShareStatus] = useState<string | null>(null);
+
+  // Native WhatsApp share using Web Share API with File blob, or fallback to direct WhatsApp URL
   const handleShareWhatsApp = async () => {
     const canvas = canvasRef.current;
-    const shareText = `*${profile.shopName || 'हमारी दुकान'}* की ओर से हार्दिक शुभकामनाएं!\n\n${template.mainQuoteHindi}\n\n📞 संपर्क: ${profile.phone}\n📍 पता: ${profile.city}\n\n_10 सेकंड में अपनी दुकान का स्टेटस बनाएं: DukaanBrand_`;
+    if (!canvas) return;
 
-    if (canvas && navigator.canShare) {
-      try {
-        canvas.toBlob(async (blob) => {
-          if (blob && navigator.canShare({ files: [new File([blob], 'dukaan_status.jpg', { type: 'image/jpeg' })] })) {
-            const file = new File([blob], 'dukaan_status.jpg', { type: 'image/jpeg' });
-            await navigator.share({
-              title: profile.shopName || 'दुकान स्टेटस',
-              text: shareText,
-              files: [file],
-            });
-            return;
-          }
-          // Fallback if file sharing not permitted
-          window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`, '_blank');
-        }, 'image/jpeg', 0.95);
-        return;
-      } catch (err) {
-        // Fallback
+    setShareStatus('शेयरिंग तैयार हो रही है...');
+
+    const greeting = language === 'hinglish' ? template.mainQuoteHindi : template.mainQuoteEnglish;
+    const shareText = `*${profile.shopName || 'हमारी दुकान'}* की ओर से हार्दिक शुभकामनाएं!\n\n${greeting}\n\n${
+      profile.specialOffer ? `🔥 विशेष ऑफर: ${profile.specialOffer}\n` : ''
+    }📞 संपर्क / ऑर्डर: ${profile.phone || ''}\n📍 पता: ${profile.city || ''}\n\n_10 सेकंड में अपनी दुकान का फ्री स्टेटस बनाएं: DukaanBrand_`;
+
+    try {
+      // 1. Convert canvas to JPEG blob
+      const blob = await new Promise<Blob | null>((resolve) => {
+        canvas.toBlob((b) => resolve(b), 'image/jpeg', 0.95);
+      });
+
+      if (!blob) {
+        throw new Error('Canvas conversion failed');
       }
-    }
 
-    // Default web whatsapp fallback
-    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`, '_blank');
+      const fileName = `${(profile.shopName || 'dukaan').replace(/\s+/g, '_')}_status.jpg`;
+      const file = new File([blob], fileName, { type: 'image/jpeg' });
+
+      // 2. Try native Web Share API with image file attachment
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          title: profile.shopName || 'दुकान स्टेटस',
+          text: shareText,
+          files: [file],
+        });
+        setShareStatus('✓ WhatsApp पर सफलतापूर्वक शेयर हुआ!');
+        setTimeout(() => setShareStatus(null), 4000);
+        return;
+      }
+
+      // 3. Fallback: Download file automatically and open WhatsApp
+      const downloadLink = document.createElement('a');
+      downloadLink.href = URL.createObjectURL(blob);
+      downloadLink.download = fileName;
+      downloadLink.click();
+
+      const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
+      window.open(waUrl, '_blank');
+
+      setShareStatus('✓ पोस्टर डाउनलोड हुआ और WhatsApp खुल गया!');
+      setTimeout(() => setShareStatus(null), 5000);
+    } catch (err: unknown) {
+      // User cancelled share dialog or permission denied
+      if (err instanceof Error && err.name === 'AbortError') {
+        setShareStatus(null);
+        return;
+      }
+
+      // Safe fallback to web WhatsApp
+      const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
+      window.open(waUrl, '_blank');
+      setShareStatus('✓ WhatsApp चैट खुल गई है!');
+      setTimeout(() => setShareStatus(null), 4000);
+    }
   };
 
   return (
@@ -475,25 +510,57 @@ export const CanvasRenderer: React.FC<CanvasRendererProps> = ({
         </div>
 
         {/* Action Controls underneath preview */}
-        <div className="w-full space-y-3 mt-4">
+        <div className="w-full space-y-2.5 mt-4">
+          {/* Main WhatsApp Share Button (Native Web Share / Direct WA) */}
+          <button
+            type="button"
+            onClick={handleShareWhatsApp}
+            className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-green-500 hover:from-emerald-500 hover:to-green-400 text-white font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30 active:scale-98 transition-all cursor-pointer border border-emerald-400/30"
+          >
+            <Share2 className="w-5 h-5 text-white shrink-0 animate-pulse" />
+            <span>📲 WhatsApp पर सीधे शेयर करें (फोटो + संदेश)</span>
+          </button>
+
+          {/* Secondary Action: Save to Gallery */}
           <div className="grid grid-cols-2 gap-2">
             <button
+              type="button"
               onClick={handleDownload}
               disabled={isDownloading}
-              className="py-3.5 px-3 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-lg shadow-orange-500/25 active:scale-95 transition-all cursor-pointer disabled:opacity-50"
+              className="py-3 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xs flex items-center justify-center gap-1.5 border border-slate-700 shadow-sm active:scale-95 transition-all cursor-pointer disabled:opacity-50"
             >
-              <Download className="w-4 h-4 text-slate-950 shrink-0" />
-              <span>{isDownloading ? 'तैयार हो रहा...' : (language === 'hinglish' ? 'डाउनलोड HD' : 'Download HD')}</span>
+              <Download className="w-4 h-4 text-amber-400 shrink-0" />
+              <span>{isDownloading ? 'तैयार...' : 'गैलरी में सेव करें'}</span>
             </button>
 
             <button
-              onClick={handleShareWhatsApp}
-              className="py-3.5 px-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-600/25 active:scale-95 transition-all cursor-pointer"
+              type="button"
+              onClick={() => {
+                const canvas = canvasRef.current;
+                if (!canvas) return;
+                canvas.toBlob((blob) => {
+                  if (blob && navigator.clipboard && window.ClipboardItem) {
+                    navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+                    setShareStatus('✓ पोस्टर कॉपी हो गया! अब WhatsApp पर पेस्ट करें।');
+                    setTimeout(() => setShareStatus(null), 4000);
+                  } else {
+                    handleDownload();
+                  }
+                }, 'image/png');
+              }}
+              className="py-3 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xs flex items-center justify-center gap-1.5 border border-slate-700 shadow-sm active:scale-95 transition-all cursor-pointer"
             >
-              <Share2 className="w-4 h-4 shrink-0" />
-              <span>{language === 'hinglish' ? 'WhatsApp स्टेटस' : 'Share Status'}</span>
+              <Sparkles className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span>पोस्टर कॉपी करें</span>
             </button>
           </div>
+
+          {/* Dynamic feedback toast */}
+          {shareStatus && (
+            <div className="p-2.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs text-center font-bold animate-fadeIn">
+              {shareStatus}
+            </div>
+          )}
 
           {/* Pro Jugad Teaser */}
           {!isPro ? (
@@ -524,8 +591,8 @@ export const CanvasRenderer: React.FC<CanvasRendererProps> = ({
           )}
 
           {downloadSuccess && (
-            <div className="p-3 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs text-center font-bold animate-fadeIn">
-              ✓ पोस्टर फोन गैलरी में सेव हो गया! अब WhatsApp खोलकर स्टेटस लगाएं।
+            <div className="p-2.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs text-center font-bold animate-fadeIn">
+              ✓ पोस्टर फोन गैलरी में सेव हो गया! WhatsApp स्टेटस पर लगाएं।
             </div>
           )}
         </div>
@@ -533,3 +600,4 @@ export const CanvasRenderer: React.FC<CanvasRendererProps> = ({
     </div>
   );
 };
+

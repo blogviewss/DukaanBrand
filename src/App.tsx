@@ -10,6 +10,7 @@ import { CanvasRenderer } from './components/CanvasRenderer';
 import { ProCheckoutModal } from './components/ProCheckoutModal';
 import { AdminPortal } from './components/AdminPortal';
 import { SiteAccessGatekeeper } from './components/SiteAccessGatekeeper';
+import { SalesTipsCard } from './components/SalesTipsCard';
 import { 
   Sparkles, 
   Crown, 
@@ -496,6 +497,9 @@ export default function App() {
 
       {/* Main Container */}
       <main className="flex-1 max-w-6xl mx-auto px-3 sm:px-6 py-3 sm:py-6 w-full space-y-4">
+        {/* Daily Shop Sales Tip Banner (दुकानदार कमाई टिप) */}
+        <SalesTipsCard shopName={profile.shopName} />
+
         {/* Mobile Navigation Tabs (Super clear 4 buttons for illiterate/ordinary users) */}
         <div className="block lg:hidden">
           <div className="grid grid-cols-4 gap-1 p-1 bg-slate-900 border border-slate-800 rounded-2xl shadow-lg text-[11px] font-black">
