@@ -161,6 +161,22 @@ export const HostingGuideModal: React.FC<HostingGuideModalProps> = ({
                 </p>
               </div>
             </div>
+
+            {/* Error Fix Box for npm install error */}
+            <div className="mt-3 p-3.5 rounded-xl bg-rose-950/40 border border-rose-500/40 space-y-2">
+              <strong className="text-rose-300 font-bold text-xs flex items-center gap-1.5">
+                <span>⚠️ अगर Vercel पर "Command npm install exited with 1" एरर आए:</span>
+              </strong>
+              <p className="text-slate-300 text-[11px] leading-relaxed">
+                यह React 19 के कारण होता है। <strong>1 सेकंड का फिक्स:</strong> Vercel डैशबोर्ड में <strong>Settings &gt; Build &amp; Development Settings &gt; Install Command</strong> को "Override" ऑन करें और वहां यह लिख दें:
+              </p>
+              <div className="bg-slate-950 p-2 rounded-lg border border-slate-800 text-xs font-mono text-emerald-400 font-bold flex items-center justify-between">
+                <span>npm install --legacy-peer-deps</span>
+              </div>
+              <p className="text-[10px] text-slate-400">
+                *(नोट: हमने आपके प्रोजेक्ट में <code>vercel.json</code> और <code>.npmrc</code> पहले से जोड़ दिया है जो इसे अपने आप ठीक कर देता है!)*
+              </p>
+            </div>
           </div>
 
           {/* Section 3: Zero Cost Guarantee */}
