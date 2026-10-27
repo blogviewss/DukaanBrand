@@ -54,30 +54,45 @@ export const DukaanHeader: React.FC<DukaanHeaderProps> = ({
             <div>
               <div className="flex items-center gap-1.5">
                 <h1 className="font-black text-base sm:text-lg tracking-tight text-white">
-                  {language === 'english' ? 'DukaanBrand' : 'दुकान ब्रांड'}
+                  {language === 'hindi' ? 'दुकान ब्रांड' : 'DukaanBrand'}
                 </h1>
                 <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                  {language === 'english' ? 'Poster Maker' : 'पोस्टर मेकर'}
+                  {language === 'hindi' ? 'पोस्टर मेकर' : language === 'hinglish' ? 'Poster Maker' : 'Poster Maker'}
                 </span>
               </div>
               <p className="text-[11px] text-slate-400 hidden sm:block">
-                {language === 'english'
-                  ? 'Create WhatsApp status posters for your shop in 10 seconds'
-                  : 'अपनी दुकान का नाम व मोबाइल नंबर वाला WhatsApp स्टेटस 10 सेकंड में बनाएं'}
+                {language === 'hindi'
+                  ? 'अपनी दुकान का नाम व मोबाइल नंबर वाला WhatsApp स्टेटस 10 सेकंड में बनाएं'
+                  : language === 'hinglish'
+                  ? 'Apni dukaan ka WhatsApp status poster 10 second me banayein'
+                  : 'Create WhatsApp status posters for your shop in 10 seconds'}
               </p>
             </div>
           </div>
 
           {/* Right Action Controls */}
           <div className="flex items-center gap-2">
-            {/* Language Switcher Pill */}
-            <div className="bg-slate-950 p-0.5 rounded-xl border border-slate-800 flex items-center">
+            {/* 3-Language Switcher Pill: Hinglish / Hindi / English */}
+            <div className="bg-slate-950 p-0.5 rounded-xl border border-slate-800 flex items-center shadow-inner">
               <button
                 type="button"
                 onClick={() => onLanguageChange('hinglish')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                title="Hinglish (बोलचाल की भाषा)"
+                className={`px-2 sm:px-2.5 py-1 rounded-lg text-[11px] sm:text-xs font-bold transition-all cursor-pointer ${
                   language === 'hinglish'
-                    ? 'bg-amber-500 text-slate-950 shadow-sm'
+                    ? 'bg-amber-500 text-slate-950 shadow-sm font-black'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                Hinglish
+              </button>
+              <button
+                type="button"
+                onClick={() => onLanguageChange('hindi')}
+                title="शुद्ध हिन्दी (Pure Hindi)"
+                className={`px-2 sm:px-2.5 py-1 rounded-lg text-[11px] sm:text-xs font-bold transition-all cursor-pointer ${
+                  language === 'hindi'
+                    ? 'bg-amber-500 text-slate-950 shadow-sm font-black'
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
@@ -86,9 +101,10 @@ export const DukaanHeader: React.FC<DukaanHeaderProps> = ({
               <button
                 type="button"
                 onClick={() => onLanguageChange('english')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                title="English"
+                className={`px-2 sm:px-2.5 py-1 rounded-lg text-[11px] sm:text-xs font-bold transition-all cursor-pointer ${
                   language === 'english'
-                    ? 'bg-amber-500 text-slate-950 shadow-sm'
+                    ? 'bg-amber-500 text-slate-950 shadow-sm font-black'
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
@@ -100,7 +116,9 @@ export const DukaanHeader: React.FC<DukaanHeaderProps> = ({
             {isPro ? (
               <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-black">
                 <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                <span className="hidden sm:inline">VIP Pro एक्टिव</span>
+                <span className="hidden sm:inline">
+                  {language === 'hindi' ? 'वीआईपी प्रो सक्रिय' : 'VIP Pro Active'}
+                </span>
                 <span className="sm:hidden">VIP</span>
               </div>
             ) : (

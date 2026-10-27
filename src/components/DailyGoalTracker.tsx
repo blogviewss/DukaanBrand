@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Target, Trophy, Flame, Plus, CheckCircle, RotateCcw, ChevronDown, ChevronUp, Share2, Sparkles } from 'lucide-react';
+import { Language } from '../types';
 
 interface DailyGoalTrackerProps {
   onShareTriggered?: () => void;
   currentCount: number;
   onIncrement: () => void;
   onReset: () => void;
-  language?: 'hinglish' | 'english';
+  language?: Language;
 }
 
 export const DailyGoalTracker: React.FC<DailyGoalTrackerProps> = ({
@@ -15,7 +16,9 @@ export const DailyGoalTracker: React.FC<DailyGoalTrackerProps> = ({
   onReset,
   language = 'hinglish',
 }) => {
-  const isHindi = language === 'hinglish';
+  const isEn = language === 'english';
+  const isHi = language === 'hindi';
+  const isHindi = language !== 'english';
   const [goal, setGoal] = useState<number>(() => {
     const saved = localStorage.getItem('dukaan_daily_goal_target');
     return saved ? parseInt(saved, 10) || 50 : 50;

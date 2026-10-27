@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { AdminConfig, PaymentRecord, SecurityAuditLog, DynamicVipToken } from '../types/admin';
 import { Language } from '../types';
 import { AdminAnalytics } from './AdminAnalytics';
+import { MiniDashboard } from './MiniDashboard';
 import { ProfitPotentialCalculator } from './ProfitPotentialCalculator';
 import { BroadcastExportModal } from './BroadcastExportModal';
 import { 
@@ -34,7 +35,8 @@ import {
   Copy,
   Check,
   TrendingUp,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Share2
 } from 'lucide-react';
 
 interface AdminPortalProps {
@@ -53,7 +55,7 @@ interface AdminPortalProps {
   language: Language;
 }
 
-type AdminTab = 'analytics' | 'profit_calculator' | 'upi' | 'vip_generator' | 'subscribers' | 'audit_log' | 'security';
+type AdminTab = 'mini_dashboard' | 'analytics' | 'profit_calculator' | 'upi' | 'vip_generator' | 'subscribers' | 'audit_log' | 'security';
 
 export const AdminPortal: React.FC<AdminPortalProps> = ({
   config,
@@ -70,7 +72,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   onResetSessionTimer,
   language,
 }) => {
-  const [activeTab, setActiveTab] = useState<AdminTab>('analytics');
+  const [activeTab, setActiveTab] = useState<AdminTab>('mini_dashboard');
   const [formData, setFormData] = useState<AdminConfig>(config);
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [newPhone, setNewPhone] = useState('');
@@ -268,15 +270,27 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
         {/* Navigation Tabs */}
         <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-800/80">
           <button
+            onClick={() => setActiveTab('mini_dashboard')}
+            className={`px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 ${
+              activeTab === 'mini_dashboard'
+                ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20 font-black'
+                : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
+            }`}
+          >
+            <Share2 className="w-4 h-4 text-slate-950" />
+            <span>1. मिनी डैशबोर्ड (Shares & Templates)</span>
+          </button>
+
+          <button
             onClick={() => setActiveTab('analytics')}
             className={`px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 ${
               activeTab === 'analytics'
-                ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
+                ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20 font-black'
                 : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
             }`}
           >
             <BarChart3 className="w-4 h-4" />
-            <span>1. लाइव एनालिटिक्स (Analytics)</span>
+            <span>2. विस्तृत एनालिटिक्स (Visitors)</span>
           </button>
 
           <button
@@ -288,69 +302,74 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
             }`}
           >
             <TrendingUp className="w-4 h-4 text-emerald-400" />
-            <span>प्रॉफिट व कमाई कैलकुलेटर (Profit Tool)</span>
+            <span>3. प्रॉफिट कैलकुलेटर (Profit Tool)</span>
           </button>
 
           <button
             onClick={() => setActiveTab('upi')}
             className={`px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 ${
               activeTab === 'upi'
-                ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
+                ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20 font-black'
                 : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
             }`}
           >
             <QrCode className="w-4 h-4" />
-            <span>2. UPI व पेमेंट सेटिंग्स (Owner UPI)</span>
+            <span>4. UPI सेटिंग्स (Owner UPI)</span>
           </button>
 
           <button
             onClick={() => setActiveTab('vip_generator')}
             className={`px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 ${
               activeTab === 'vip_generator'
-                ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/20'
+                ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/20 font-black'
                 : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
             }`}
           >
             <Key className="w-4 h-4" />
-            <span>3. सिंगल-यूज़ VIP कोड (Anti-Share)</span>
+            <span>5. सिंगल-यूज़ VIP कोड (Anti-Share)</span>
           </button>
 
           <button
             onClick={() => setActiveTab('subscribers')}
             className={`px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 ${
               activeTab === 'subscribers'
-                ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
+                ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20 font-black'
                 : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
             }`}
           >
             <Users className="w-4 h-4" />
-            <span>4. ग्राहक लेजर ({payments.length})</span>
+            <span>6. ग्राहक लेजर ({payments.length})</span>
           </button>
 
           <button
             onClick={() => setActiveTab('audit_log')}
             className={`px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 ${
               activeTab === 'audit_log'
-                ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
+                ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20 font-black'
                 : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
             }`}
           >
             <ShieldAlert className="w-4 h-4" />
-            <span>5. सुरक्षा ऑडिट लॉग ({auditLogs.length})</span>
+            <span>7. सुरक्षा ऑडिट लॉग ({auditLogs.length})</span>
           </button>
 
           <button
             onClick={() => setActiveTab('security')}
             className={`px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 ${
               activeTab === 'security'
-                ? 'bg-rose-500 text-white shadow-md shadow-rose-500/20'
+                ? 'bg-rose-500 text-white shadow-md shadow-rose-500/20 font-black'
                 : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
             }`}
           >
             <ShieldCheck className="w-4 h-4" />
-            <span>6. पासवर्ड व साइट लॉक (Lock & Key)</span>
+            <span>8. पासवर्ड व साइट लॉक (Lock & Key)</span>
           </button>
         </div>
+
+        {/* TAB 0: MINI DASHBOARD (Visualizing daily share counts and popular templates via Recharts) */}
+        {activeTab === 'mini_dashboard' && (
+          <MiniDashboard language={language} />
+        )}
 
         {/* TAB 1: ANALYTICS (Recharts Interactive Visualizations) */}
         {activeTab === 'analytics' && (

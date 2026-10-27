@@ -46,12 +46,15 @@ export const ShopProfileForm: React.FC<ShopProfileFormProps> = ({
     });
   };
 
+  const isEn = language === 'english';
+  const isHi = language === 'hindi';
+
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-3xl p-4 sm:p-6 space-y-4 text-white shadow-xl">
       {/* 1. Size Selection: 9:16 Status vs 1:1 Square */}
       <div>
         <label className="block text-xs font-black uppercase tracking-wider text-slate-400 mb-2">
-          {language === 'hinglish' ? 'पोस्टर का आकार (Size):' : 'Select Poster Size:'}
+          {isEn ? 'Select Poster Size:' : isHi ? 'पोस्टर का आकार (साइज):' : 'Poster Ka Size (Format):'}
         </label>
         <div className="grid grid-cols-2 gap-2">
           <button
@@ -64,7 +67,7 @@ export const ShopProfileForm: React.FC<ShopProfileFormProps> = ({
             }`}
           >
             <Smartphone className="w-4 h-4 text-amber-400" />
-            <span>WhatsApp स्टेटस (9:16)</span>
+            <span>{isEn ? 'WhatsApp Status (9:16)' : isHi ? 'व्हाट्सएप स्टेटस (9:16)' : 'WhatsApp Status (9:16)'}</span>
           </button>
 
           <button
@@ -77,16 +80,22 @@ export const ShopProfileForm: React.FC<ShopProfileFormProps> = ({
             }`}
           >
             <Square className="w-4 h-4 text-sky-400" />
-            <span>चौकोर DP / पोस्ट (1:1)</span>
+            <span>{isEn ? 'Square Post / DP (1:1)' : isHi ? 'चौकोर डीपी / पोस्ट (1:1)' : 'Square Post / DP (1:1)'}</span>
           </button>
         </div>
       </div>
 
-      {/* 2. Quick 1-Tap Category Presets (For illiterate or busy shopkeepers) */}
+      {/* 2. Quick 1-Tap Category Presets */}
       <div className="bg-slate-950 p-3 rounded-2xl border border-slate-800/80">
         <label className="block text-[11px] font-black uppercase text-amber-400 mb-2 flex items-center gap-1.5">
           <Sparkles className="w-3.5 h-3.5" />
-          <span>1-क्लिक में दुकान चुनें (Auto-Fill):</span>
+          <span>
+            {isEn
+              ? '1-Click Auto-Fill Store Type:'
+              : isHi
+              ? '1-क्लिक में दुकान प्रकार चुनें (ऑटो-फिल):'
+              : '1-Click Me Dukaan Chunein (Auto-Fill):'}
+          </span>
         </label>
         <div className="flex flex-wrap gap-1.5">
           {SHOP_PRESETS.map((preset, idx) => (
@@ -107,14 +116,14 @@ export const ShopProfileForm: React.FC<ShopProfileFormProps> = ({
         <div>
           <label className="block text-xs font-bold text-slate-300 mb-1 flex items-center gap-1.5">
             <Store className="w-4 h-4 text-amber-400" />
-            <span>दुकान या व्यापार का नाम *</span>
+            <span>{isEn ? 'Shop or Business Name *' : isHi ? 'दुकान या व्यापार का नाम *' : 'Dukaan Ka Naam *'}</span>
           </label>
           <input
             type="text"
             value={profile.shopName}
             onChange={(e) => onChange({ shopName: e.target.value })}
             className="w-full bg-slate-950 border border-slate-700 rounded-2xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400 font-bold"
-            placeholder="उदा. श्री बालाजी किराना स्टोर"
+            placeholder={isEn ? 'e.g. Balaji Provisions & Grocery' : 'उदा. श्री बालाजी किराना स्टोर'}
           />
         </div>
 
@@ -122,7 +131,7 @@ export const ShopProfileForm: React.FC<ShopProfileFormProps> = ({
           <div>
             <label className="block text-xs font-bold text-slate-300 mb-1 flex items-center gap-1.5">
               <Phone className="w-4 h-4 text-emerald-400" />
-              <span>WhatsApp / फोन नंबर *</span>
+              <span>{isEn ? 'WhatsApp / Phone Number *' : isHi ? 'व्हाट्सएप / फोन नंबर *' : 'WhatsApp / Mobile Number *'}</span>
             </label>
             <input
               type="text"
@@ -136,14 +145,14 @@ export const ShopProfileForm: React.FC<ShopProfileFormProps> = ({
           <div>
             <label className="block text-xs font-bold text-slate-300 mb-1 flex items-center gap-1.5">
               <User className="w-4 h-4 text-sky-400" />
-              <span>मालिक / प्रोप्राइटर (वैकल्पिक)</span>
+              <span>{isEn ? 'Owner Name (Optional)' : isHi ? 'मालिक का नाम (वैकल्पिक)' : 'Malik Ka Naam (Optional)'}</span>
             </label>
             <input
               type="text"
               value={profile.ownerName}
               onChange={(e) => onChange({ ownerName: e.target.value })}
               className="w-full bg-slate-950 border border-slate-700 rounded-2xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400"
-              placeholder="उदा. रमेश कुमार जी"
+              placeholder={isEn ? 'e.g. Ramesh Kumar' : 'उदा. रमेश कुमार जी'}
             />
           </div>
         </div>
@@ -151,14 +160,14 @@ export const ShopProfileForm: React.FC<ShopProfileFormProps> = ({
         <div>
           <label className="block text-xs font-bold text-slate-300 mb-1 flex items-center gap-1.5">
             <MapPin className="w-4 h-4 text-rose-400" />
-            <span>दुकान का पता व शहर</span>
+            <span>{isEn ? 'Shop Address & Market' : isHi ? 'दुकान का पता व बाजार' : 'Dukaan Ka Pata / Market'}</span>
           </label>
           <input
             type="text"
             value={profile.city}
             onChange={(e) => onChange({ city: e.target.value })}
             className="w-full bg-slate-950 border border-slate-700 rounded-2xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400"
-            placeholder="मेन मार्केट, चौक बाजार, शहर"
+            placeholder={isEn ? 'Main Market, City Center' : 'मेन मार्केट, चौक बाजार, शहर'}
           />
         </div>
 
@@ -167,7 +176,13 @@ export const ShopProfileForm: React.FC<ShopProfileFormProps> = ({
           <div className="flex items-center justify-between">
             <label className="text-xs font-black text-amber-300 flex items-center gap-1.5">
               <QrCode className="w-4 h-4 text-amber-400" />
-              <span>पोस्टर पर Google Pay / PhonePe QR लगाएं</span>
+              <span>
+                {isEn
+                  ? 'Embed Google Pay / PhonePe QR on Poster (VIP)'
+                  : isHi
+                  ? 'पोस्टर पर असली गूगल पे/फोनपे क्यूआर लगाएं (वीआईपी)'
+                  : 'Poster Pe Google Pay / PhonePe QR Lagayein (VIP)'}
+              </span>
             </label>
             <input
               type="checkbox"
@@ -185,7 +200,11 @@ export const ShopProfileForm: React.FC<ShopProfileFormProps> = ({
           </div>
 
           <p className="text-[11px] text-slate-400">
-            जब आप WhatsApp पर स्टेटस लगाएंगे, तो ग्राहक सीधे पोस्टर का QR कोड स्कैन करके आपको पैसे भेज सकेंगे!
+            {isEn
+              ? 'When you post to WhatsApp status, customers can scan this QR code directly to pay you!'
+              : isHi
+              ? 'जब आप व्हाट्सएप पर स्टेटस लगाएंगे, तो ग्राहक सीधे पोस्टर का क्यूआर कोड स्कैन करके आपको पैसे भेज सकेंगे!'
+              : 'Jab aap WhatsApp pe status lagayenge, to customer direct poster ka QR scan karke payment kar sakenge!'}
           </p>
 
           {(profile.showUpiQr || isPro) && (
@@ -195,7 +214,7 @@ export const ShopProfileForm: React.FC<ShopProfileFormProps> = ({
                 value={profile.upiId || ''}
                 onChange={(e) => onChange({ upiId: e.target.value, showUpiQr: true })}
                 className="w-full bg-slate-900 border border-amber-500/50 rounded-xl px-3 py-2 text-xs text-amber-200 focus:outline-none font-mono"
-                placeholder="उदा. yourname@okaxis या 98xxxx@paytm"
+                placeholder={isEn ? 'e.g. yourname@okaxis or 98xxxx@paytm' : 'उदा. yourname@okaxis या 98xxxx@paytm'}
               />
             </div>
           )}
@@ -205,14 +224,26 @@ export const ShopProfileForm: React.FC<ShopProfileFormProps> = ({
         <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
           <label className="block text-xs font-bold text-slate-300 flex items-center gap-1.5">
             <Tag className="w-4 h-4 text-orange-400" />
-            <span>आज का स्पेशल ऑफर या छूट (वैकल्पिक)</span>
+            <span>
+              {isEn
+                ? "Today's Special Offer / Discount (Optional)"
+                : isHi
+                ? 'आज का विशेष ऑफर या छूट (वैकल्पिक)'
+                : 'Aaj Ka Special Offer / Discount (Optional)'}
+            </span>
           </label>
           <input
             type="text"
             value={profile.specialOffer || ''}
             onChange={(e) => onChange({ specialOffer: e.target.value })}
             className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-400"
-            placeholder="उदा. सभी सामानों पर 10% की भारी छूट! / फ्री होम डिलीवरी"
+            placeholder={
+              isEn
+                ? 'e.g. Flat 15% Off on all Grocery / Free Home Delivery'
+                : isHi
+                ? 'उदा. सभी सामानों पर 10% की भारी छूट! / फ्री होम डिलीवरी'
+                : 'उदा. Sabhi saaman par 10% discount! / Free Home Delivery'
+            }
           />
         </div>
 

@@ -19,19 +19,22 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({
   activeCategory,
   onCategoryChange,
 }) => {
-  const categories: { id: CategoryFilter; labelHindi: string; labelEnglish: string; icon: string }[] = [
-    { id: 'all', labelHindi: 'सभी (All)', labelEnglish: 'All', icon: '✨' },
-    { id: 'morning', labelHindi: 'शुभ प्रभात (Morning)', labelEnglish: 'Morning', icon: '🌅' },
-    { id: 'festival', labelHindi: 'त्योहार (Festivals)', labelEnglish: 'Festivals', icon: '🪔' },
-    { id: 'offers', labelHindi: 'दुकान सेल (Offers)', labelEnglish: 'Sale & Offers', icon: '🏷️' },
-    { id: 'udhar', labelHindi: 'उधारी व बिल (Udhar)', labelEnglish: 'Udhar / Bill', icon: '🧾' },
-    { id: 'card', labelHindi: 'विजिटिंग कार्ड', labelEnglish: 'Business Card', icon: '🪪' },
-    { id: 'night', labelHindi: 'शुभ रात्रि (Night)', labelEnglish: 'Night', icon: '🌙' },
+  const categories: { id: CategoryFilter; labelHinglish: string; labelHindi: string; labelEnglish: string; icon: string }[] = [
+    { id: 'all', labelHinglish: 'Sabhi (All)', labelHindi: 'सभी (All)', labelEnglish: 'All', icon: '✨' },
+    { id: 'morning', labelHinglish: 'Shubh Prabhat', labelHindi: 'शुभ प्रभात', labelEnglish: 'Morning Suvichar', icon: '🌅' },
+    { id: 'festival', labelHinglish: 'Tyohar (Festivals)', labelHindi: 'पावन त्योहार', labelEnglish: 'Festivals', icon: '🪔' },
+    { id: 'offers', labelHinglish: 'Dukaan Sale', labelHindi: 'दुकान सेल व ऑफर', labelEnglish: 'Sale & Offers', icon: '🏷️' },
+    { id: 'udhar', labelHinglish: 'Udhar & Bill', labelHindi: 'उधारी व बिल रसीद', labelEnglish: 'Udhar / Bill Notice', icon: '🧾' },
+    { id: 'card', labelHinglish: 'Visiting Card', labelHindi: 'विजिटिंग कार्ड', labelEnglish: 'Business Card', icon: '🪪' },
+    { id: 'night', labelHinglish: 'Shubh Ratri', labelHindi: 'शुभ रात्रि', labelEnglish: 'Good Night', icon: '🌙' },
   ];
 
   const filteredTemplates = activeCategory === 'all'
     ? TEMPLATES_DATA
     : TEMPLATES_DATA.filter((t) => t.category === activeCategory);
+
+  const isEn = language === 'english';
+  const isHi = language === 'hindi';
 
   return (
     <div className="space-y-4">
@@ -39,6 +42,7 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({
       <div className="flex items-center gap-1.5 overflow-x-auto pb-2 scrollbar-none">
         {categories.map((cat) => {
           const isActive = activeCategory === cat.id;
+          const label = isEn ? cat.labelEnglish : isHi ? cat.labelHindi : cat.labelHinglish;
           return (
             <button
               key={cat.id}
@@ -46,12 +50,12 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({
               onClick={() => onCategoryChange(cat.id)}
               className={`px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 ${
                 isActive
-                  ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
+                  ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20 font-black'
                   : 'bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700'
               }`}
             >
               <span>{cat.icon}</span>
-              <span>{language === 'hinglish' ? cat.labelHindi : cat.labelEnglish}</span>
+              <span>{label}</span>
             </button>
           );
         })}
@@ -61,6 +65,10 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {filteredTemplates.map((template) => {
           const isSelected = template.id === selectedTemplate.id;
+          const headerTag = isEn ? template.headerTagEnglish : template.headerTagHindi;
+          const title = isEn ? template.titleEnglish : template.titleHindi;
+          const mainQuote = isEn ? template.mainQuoteEnglish : template.mainQuoteHindi;
+
           return (
             <div
               key={template.id}
@@ -84,7 +92,7 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({
                     background: 'rgba(0, 0, 0, 0.4)',
                   }}
                 >
-                  {language === 'hinglish' ? template.headerTagHindi : template.headerTagEnglish}
+                  {headerTag}
                 </span>
 
                 {isSelected ? (
@@ -101,17 +109,19 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({
               {/* Title & Preview Quote */}
               <div>
                 <h5 className="font-bold text-xs sm:text-sm text-white line-clamp-1 mb-1">
-                  {language === 'hinglish' ? template.titleHindi : template.titleEnglish}
+                  {title}
                 </h5>
                 <p className="text-[11px] text-slate-300 line-clamp-2 leading-relaxed">
-                  "{language === 'hinglish' ? template.mainQuoteHindi : template.mainQuoteEnglish}"
+                  "{mainQuote}"
                 </p>
               </div>
 
               {/* Bottom decorative color bar */}
               <div className="mt-3 pt-2 border-t border-white/10 flex items-center justify-between text-[10px] text-slate-400">
                 <span className="capitalize">{template.category}</span>
-                <span className="text-amber-300 font-semibold group-hover:underline">चुनें →</span>
+                <span className="text-amber-300 font-semibold group-hover:underline">
+                  {isEn ? 'Select →' : isHi ? 'चुनें →' : 'Chunein →'}
+                </span>
               </div>
             </div>
           );

@@ -1,4 +1,4 @@
-export type Language = 'hinglish' | 'english';
+export type Language = 'hinglish' | 'hindi' | 'english';
 
 export interface ViralIdea {
   id: string;

@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Lightbulb, Sparkles, RefreshCw, TrendingUp } from 'lucide-react';
+import { Language } from '../types';
 
 interface SalesTipsCardProps {
   shopName?: string;
-  language?: 'hinglish' | 'english';
+  language?: Language;
 }
 
 const SALES_TIPS_HINDI = [

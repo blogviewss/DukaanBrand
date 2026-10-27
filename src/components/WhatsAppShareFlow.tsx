@@ -44,7 +44,9 @@ export const WhatsAppShareFlow: React.FC<WhatsAppShareFlowProps> = ({
   const DEFAULT_PUBLIC_DOMAIN = 'https://dukaan-brand.vercel.app';
   const [customDomain, setCustomDomain] = useState<string>(DEFAULT_PUBLIC_DOMAIN);
 
-  const isHindi = language === 'hinglish';
+  const isEn = language === 'english';
+  const isHi = language === 'hindi';
+  const isHindi = language !== 'english';
 
   // Smart domain resolver: guarantees outside customers open public Vercel app without Google sign-in
   const publicBaseDomain = useMemo(() => {
@@ -245,7 +247,7 @@ ${posterWebLink}
           }`}
         >
           <Sparkles className="w-3.5 h-3.5" />
-          <span>{isHindi ? '🔥 महा डिस्काउंट' : '🔥 Big Discount'}</span>
+          <span>{isEn ? '🔥 Mega Discount' : isHi ? '🔥 महा डिस्काउंट' : '🔥 Maha Discount'}</span>
         </button>
 
         <button
@@ -258,7 +260,7 @@ ${posterWebLink}
           }`}
         >
           <ShoppingBag className="w-3.5 h-3.5" />
-          <span>{isHindi ? '📦 नया स्टॉक' : '📦 New Stock'}</span>
+          <span>{isEn ? '📦 Fresh Stock' : isHi ? '📦 नया स्टॉक' : '📦 Naya Stock'}</span>
         </button>
 
         <button
@@ -271,7 +273,7 @@ ${posterWebLink}
           }`}
         >
           <Truck className="w-3.5 h-3.5" />
-          <span>{isHindi ? '🚚 फ्री डिलीवरी' : '🚚 Free Delivery'}</span>
+          <span>{isEn ? '🚚 Free Delivery' : isHi ? '🚚 फ्री डिलीवरी' : '🚚 Free Delivery'}</span>
         </button>
 
         <button
@@ -284,7 +286,7 @@ ${posterWebLink}
           }`}
         >
           <Gift className="w-3.5 h-3.5" />
-          <span>{isHindi ? '🪔 पर्व/त्योहार' : '🪔 Festive'}</span>
+          <span>{isEn ? '🪔 Festive' : isHi ? '🪔 पर्व व त्योहार' : '🪔 Parv / Festival'}</span>
         </button>
       </div>
 
@@ -332,7 +334,13 @@ ${posterWebLink}
           className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-green-500 hover:from-emerald-500 hover:to-green-400 text-white font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30 active:scale-98 transition-all cursor-pointer border border-emerald-400/40"
         >
           <Send className="w-4 h-4 text-white shrink-0" />
-          <span>{isHindi ? 'WhatsApp पर तुरंत भेजें (1-Click)' : 'Send to WhatsApp (1-Click)'}</span>
+          <span>
+            {isEn
+              ? 'Send to WhatsApp (1-Click)'
+              : isHi
+              ? 'व्हाट्सएप पर तुरंत भेजें (1-क्लिक)'
+              : 'WhatsApp Pe Turant Bhejein (1-Click)'}
+          </span>
         </button>
 
         <button
@@ -343,12 +351,16 @@ ${posterWebLink}
           {copied ? (
             <>
               <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span className="text-emerald-400">{isHindi ? '✓ संदेश कॉपी हो गया!' : '✓ Message Copied!'}</span>
+              <span className="text-emerald-400">
+                {isEn ? '✓ Message Copied!' : isHi ? '✓ संदेश कॉपी हो गया!' : '✓ Message Copy Ho Gaya!'}
+              </span>
             </>
           ) : (
             <>
               <Copy className="w-4 h-4 text-amber-400 shrink-0" />
-              <span>{isHindi ? 'संदेश कॉपी करें (Copy Text)' : 'Copy Message Text'}</span>
+              <span>
+                {isEn ? 'Copy Message Text' : isHi ? 'संदेश कॉपी करें' : 'Message Copy Karein'}
+              </span>
             </>
           )}
         </button>

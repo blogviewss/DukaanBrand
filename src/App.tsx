@@ -32,7 +32,26 @@ import {
 } from 'lucide-react';
 
 export default function App() {
-  const [language, setLanguage] = useState<Language>('hinglish');
+  const [language, setLanguageState] = useState<Language>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('dukaan_brand_language');
+      if (saved === 'hinglish' || saved === 'hindi' || saved === 'english') {
+        return saved as Language;
+      }
+    }
+    return 'hinglish';
+  });
+
+  const setLanguage = (newLang: Language) => {
+    setLanguageState(newLang);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('dukaan_brand_language', newLang);
+    }
+  };
+
+  const isEn = language === 'english';
+  const isHi = language === 'hindi';
+  const isHinglish = language === 'hinglish';
   const [viewMode, setViewMode] = useState<'customer' | 'admin'>('customer');
   const [isPro, setIsPro] = useState<boolean>(false);
   const [format, setFormat] = useState<CanvasFormat>('story');
@@ -571,7 +590,7 @@ export default function App() {
               }`}
             >
               <Eye className="w-3.5 h-3.5" />
-              <span>{language === 'english' ? '1. Poster' : '1. पोस्टर'}</span>
+              <span>{isEn ? '1. Poster' : isHi ? '1. पोस्टर' : '1. Poster'}</span>
             </button>
 
             <button
@@ -584,7 +603,7 @@ export default function App() {
               }`}
             >
               <Palette className="w-3.5 h-3.5" />
-              <span>{language === 'english' ? '2. Design' : '2. डिज़ाइन'}</span>
+              <span>{isEn ? '2. Design' : isHi ? '2. डिज़ाइन' : '2. Design'}</span>
             </button>
 
             <button
@@ -597,7 +616,7 @@ export default function App() {
               }`}
             >
               <Edit3 className="w-3.5 h-3.5" />
-              <span>{language === 'english' ? '3. Text' : '3. शब्द'}</span>
+              <span>{isEn ? '3. Text' : isHi ? '3. शब्द' : '3. Customize'}</span>
             </button>
 
             <button
@@ -610,7 +629,7 @@ export default function App() {
               }`}
             >
               <Store className="w-3.5 h-3.5" />
-              <span>{language === 'english' ? '4. Store' : '4. दुकान'}</span>
+              <span>{isEn ? '4. Store' : isHi ? '4. दुकान' : '4. Dukaan'}</span>
             </button>
 
             <button
@@ -623,7 +642,7 @@ export default function App() {
               }`}
             >
               <Crown className="w-3.5 h-3.5" />
-              <span>{language === 'english' ? '5. VIP' : '5. VIP'}</span>
+              <span>{isEn ? '5. VIP Pro' : isHi ? '5. वीआईपी' : '5. VIP Pro'}</span>
             </button>
           </div>
         </div>
@@ -880,7 +899,7 @@ export default function App() {
                   1
                 </span>
                 <h3 className="font-extrabold text-base text-white">
-                  दुकान की जानकारी भरें
+                  {isEn ? 'Step 1: Fill Store Profile' : isHi ? 'चरण 1: दुकान की जानकारी भरें' : 'Step 1: Dukaan Ki Details Bharein'}
                 </h3>
               </div>
               <ShopProfileForm
@@ -901,7 +920,7 @@ export default function App() {
                   2
                 </span>
                 <h3 className="font-extrabold text-base text-white">
-                  पोस्टर व सुविचार डिज़ाइन चुनें
+                  {isEn ? 'Step 2: Choose Poster Design' : isHi ? 'चरण 2: पोस्टर व सुविचार डिज़ाइन चुनें' : 'Step 2: Poster & Suvichar Design Chunein'}
                 </h3>
               </div>
               <TemplateSelector
