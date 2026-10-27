@@ -39,25 +39,25 @@ export const DukaanHeader: React.FC<DukaanHeaderProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 text-white">
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-14 sm:h-18">
+    <header className="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 text-white pt-[max(env(safe-area-inset-top),10px)] pb-2">
+      <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between min-h-[48px] sm:min-h-[56px] gap-1.5">
           {/* Logo & Tagline (Secret 3-click on logo triggers Owner Login) */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2 shrink-0">
             <div
               onClick={handleSecretLogoClick}
               title="दुकान ब्रांड"
-              className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-tr from-amber-500 via-orange-500 to-rose-600 flex items-center justify-center shadow-lg shadow-orange-500/20 cursor-pointer select-none active:scale-95 transition-transform"
+              className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-amber-500 via-orange-500 to-rose-600 flex items-center justify-center shadow-lg shadow-orange-500/20 cursor-pointer select-none active:scale-95 transition-transform shrink-0"
             >
-              <span className="font-black text-xl sm:text-2xl text-slate-950">द</span>
+              <span className="font-black text-lg sm:text-2xl text-slate-950">द</span>
             </div>
             <div>
-              <div className="flex items-center gap-1.5">
-                <h1 className="font-black text-base sm:text-lg tracking-tight text-white">
+              <div className="flex items-center gap-1">
+                <h1 className="font-black text-sm sm:text-lg tracking-tight text-white leading-tight">
                   {language === 'hindi' ? 'दुकान ब्रांड' : 'DukaanBrand'}
                 </h1>
-                <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                  {language === 'hindi' ? 'पोस्टर मेकर' : language === 'hinglish' ? 'Poster Maker' : 'Poster Maker'}
+                <span className="text-[9px] sm:text-[10px] font-black px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 shrink-0">
+                  {language === 'hindi' ? 'पोस्टर मेकर' : 'Poster'}
                 </span>
               </div>
               <p className="text-[11px] text-slate-400 hidden sm:block">
@@ -71,7 +71,7 @@ export const DukaanHeader: React.FC<DukaanHeaderProps> = ({
           </div>
 
           {/* Right Action Controls */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {/* 3-Language Switcher Pill: Hinglish / Hindi / English */}
             <div className="bg-slate-950 p-0.5 rounded-xl border border-slate-800 flex items-center shadow-inner">
               <button

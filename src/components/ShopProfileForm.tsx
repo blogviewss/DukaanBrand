@@ -25,15 +25,31 @@ export const ShopProfileForm: React.FC<ShopProfileFormProps> = ({
 }) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  // HTML5 File API and FileReader: reads shop logo from device and stores Base64 string in profile state
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Validate that user selected an image file
+    if (!file.type.startsWith('image/')) {
+      alert(language === 'english' ? 'Please select a valid image file (PNG/JPG)' : 'कृपया सही फोटो (PNG/JPG) चुनें');
+      return;
+    }
+
+    // HTML5 FileReader to read file as Base64 Data URL
     const reader = new FileReader();
     reader.onload = () => {
-      onChange({ logoUrl: reader.result as string });
+      if (typeof reader.result === 'string') {
+        onChange({ logoUrl: reader.result });
+      }
+    };
+    reader.onerror = (err) => {
+      console.error('FileReader failed to read image file:', err);
     };
     reader.readAsDataURL(file);
+
+    // Reset input so re-selecting same file triggers onChange
+    e.target.value = '';
   };
 
   const handlePresetSelect = (preset: typeof SHOP_PRESETS[0]) => {
@@ -247,12 +263,18 @@ export const ShopProfileForm: React.FC<ShopProfileFormProps> = ({
           />
         </div>
 
-        {/* 6. Shop Photo / Owner Photo Upload */}
-        <div>
-          <label className="block text-xs font-bold text-slate-300 mb-1.5 flex items-center justify-between">
+        {/* 6. HTML5 File API & FileReader: Shop Logo / Photo Upload */}
+        <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-2.5">
+          <label className="block text-xs font-bold text-slate-300 mb-1 flex items-center justify-between">
             <span className="flex items-center gap-1.5">
               <ImageIcon className="w-4 h-4 text-amber-400" />
-              <span>दुकान या मालिक की फोटो (वैकल्पिक)</span>
+              <span>
+                {isEn
+                  ? 'Shop Logo / Owner Photo (Device Upload):'
+                  : isHi
+                  ? 'दुकान का लोगो या फोटो (डिवाइस से अपलोड करें):'
+                  : 'Dukaan Ka Logo / Photo (Device Se Upload):'}
+              </span>
             </span>
             {profile.logoUrl && (
               <button
@@ -261,10 +283,18 @@ export const ShopProfileForm: React.FC<ShopProfileFormProps> = ({
                 className="text-rose-400 hover:text-rose-300 text-xs font-bold flex items-center gap-1 cursor-pointer"
               >
                 <X className="w-3.5 h-3.5" />
-                <span>हटाएं</span>
+                <span>{isEn ? 'Remove' : isHi ? 'हटाएं' : 'Hatayein'}</span>
               </button>
             )}
           </label>
+
+          <p className="text-[11px] text-slate-400">
+            {isEn
+              ? 'Upload your shop logo or photo from device to display inside a gold circular ring on the poster.'
+              : isHi
+              ? 'फोन या कंप्यूटर से दुकान का लोगो अपलोड करें — यह सीधे पोस्टर पर सुनहरे गोल फ्रेम में दिखेगा।'
+              : 'Phone se dukaan ka logo upload karein — poster par ye golden frame me chamkega.'}
+          </p>
 
           <input
             ref={fileInputRef}
@@ -276,23 +306,45 @@ export const ShopProfileForm: React.FC<ShopProfileFormProps> = ({
 
           <div
             onClick={() => fileInputRef.current?.click()}
-            className="w-full border-2 border-dashed border-slate-700 hover:border-amber-400 rounded-2xl p-3 flex items-center justify-center gap-3 cursor-pointer bg-slate-950 hover:bg-slate-800/40 transition-colors"
+            className={`w-full border-2 border-dashed rounded-2xl p-4 flex items-center justify-center gap-3 cursor-pointer transition-all ${
+              profile.logoUrl
+                ? 'border-emerald-500/50 bg-emerald-950/20 hover:bg-emerald-950/30'
+                : 'border-slate-700 hover:border-amber-400 bg-slate-900/60 hover:bg-slate-900'
+            }`}
           >
             {profile.logoUrl ? (
-              <div className="flex items-center gap-3">
-                <img
-                  src={profile.logoUrl}
-                  alt="Shop Logo"
-                  className="w-10 h-10 rounded-full object-cover border-2 border-amber-400 shadow"
-                />
-                <span className="text-xs text-emerald-400 font-bold">
-                  ✓ फोटो जुड़ गई (बदलने के लिए क्लिक करें)
+              <div className="flex items-center justify-between w-full">
+                <div className="flex items-center gap-3">
+                  <img
+                    src={profile.logoUrl}
+                    alt="Shop Logo"
+                    className="w-12 h-12 rounded-full object-cover border-2 border-amber-400 shadow-md ring-2 ring-emerald-500/40"
+                  />
+                  <div>
+                    <span className="text-xs text-emerald-400 font-bold block flex items-center gap-1">
+                      <Sparkles className="w-3.5 h-3.5" />
+                      {isEn ? '✓ Logo Active on Poster' : isHi ? '✓ लोगो पोस्टर पर सक्रिय' : '✓ Logo Poster Par Active'}
+                    </span>
+                    <span className="text-[11px] text-slate-400">
+                      {isEn ? 'Click to change logo from device' : 'लोगो बदलने के लिए यहाँ क्लिक करें'}
+                    </span>
+                  </div>
+                </div>
+                <span className="text-xs text-amber-400 font-bold bg-amber-500/10 px-2.5 py-1 rounded-xl border border-amber-500/30">
+                  {isEn ? 'Change' : 'बदलें'}
                 </span>
               </div>
             ) : (
-              <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
-                <Upload className="w-4 h-4 text-amber-400" />
-                <span>गैलरी से फोटो चुनें</span>
+              <div className="flex flex-col items-center justify-center py-2 text-center">
+                <div className="w-10 h-10 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 mb-1.5">
+                  <Upload className="w-5 h-5" />
+                </div>
+                <span className="text-xs font-bold text-white">
+                  {isEn ? 'Choose Logo / Photo from Device' : 'डिवाइस या गैलरी से लोगो चुनें'}
+                </span>
+                <span className="text-[10px] text-slate-400 mt-0.5">
+                  {isEn ? 'Supports PNG, JPG, WebP (Instant Base64 Preview)' : 'PNG, JPG या कैमरा फोटो (HTML5 File Upload)'}
+                </span>
               </div>
             )}
           </div>

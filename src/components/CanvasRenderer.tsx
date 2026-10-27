@@ -449,7 +449,7 @@ export const CanvasRenderer: React.FC<CanvasRendererProps> = ({
     const greeting = customQuote || (language === 'hinglish' ? template.mainQuoteHindi : template.mainQuoteEnglish);
     const shareText = `*${profile.shopName || 'हमारी दुकान'}* की ओर से हार्दिक शुभकामनाएं!\n\n${greeting}\n\n${
       profile.specialOffer ? `🔥 विशेष ऑफर: ${profile.specialOffer}\n` : ''
-    }📞 संपर्क / ऑर्डर: ${profile.phone || ''}\n📍 पता: ${profile.city || ''}\n\n_10 सेकंड में अपनी दुकान का फ्री स्टेटस बनाएं: https://dukaan-brand.vercel.app_`;
+    }📞 संपर्क / ऑर्डर: ${profile.phone || ''}\n📍 पता: ${profile.city || ''}\n\n🙏 आपकी संतुष्टि ही हमारा विश्वास है!`;
 
     try {
       // 1. Convert canvas to JPEG blob

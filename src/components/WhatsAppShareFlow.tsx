@@ -8,12 +8,9 @@ import {
   Copy, 
   Check, 
   Sparkles, 
-  ExternalLink, 
   ShoppingBag, 
   Truck, 
   Gift, 
-  Globe, 
-  Info,
   CheckCircle2
 } from 'lucide-react';
 
@@ -38,48 +35,10 @@ export const WhatsAppShareFlow: React.FC<WhatsAppShareFlowProps> = ({
   const [copied, setCopied] = useState<boolean>(false);
   const [customNote, setCustomNote] = useState<string>('');
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [showDomainSettings, setShowDomainSettings] = useState<boolean>(false);
-
-  // Default public domain that never asks customers for Google sign-in
-  const DEFAULT_PUBLIC_DOMAIN = 'https://dukaan-brand.vercel.app';
-  const [customDomain, setCustomDomain] = useState<string>(DEFAULT_PUBLIC_DOMAIN);
 
   const isEn = language === 'english';
   const isHi = language === 'hindi';
   const isHindi = language !== 'english';
-
-  // Smart domain resolver: guarantees outside customers open public Vercel app without Google sign-in
-  const publicBaseDomain = useMemo(() => {
-    // If running in production browser on Vercel or custom domain (not an internal dev container)
-    if (typeof window !== 'undefined') {
-      const origin = window.location.origin;
-      const isInternalDev = 
-        origin.includes('ais-dev') || 
-        origin.includes('run.app') || 
-        origin.includes('localhost') || 
-        origin.includes('127.0.0.1') || 
-        origin.includes('google.com') ||
-        origin.includes('aistudio');
-      
-      if (!isInternalDev && origin.startsWith('http')) {
-        return origin;
-      }
-    }
-    if (customDomain.trim() && !customDomain.includes('run.app') && !customDomain.includes('ais-dev')) {
-      return customDomain.trim().replace(/\/$/, '');
-    }
-    return DEFAULT_PUBLIC_DOMAIN;
-  }, [customDomain]);
-
-  // Generate web link to view the poster / store
-  const posterWebLink = useMemo(() => {
-    const params = new URLSearchParams({
-      shop: profile.shopName || '',
-      phone: profile.phone || '',
-      offer: customHeader || (isHindi ? template.titleHindi : template.titleEnglish) || '',
-    });
-    return `${publicBaseDomain}/?${params.toString()}`;
-  }, [publicBaseDomain, profile.shopName, profile.phone, customHeader, isHindi, template.titleHindi, template.titleEnglish]);
 
   // Construct automated pre-filled WhatsApp message
   const generatedMessage = useMemo(() => {
@@ -114,9 +73,6 @@ export const WhatsAppShareFlow: React.FC<WhatsAppShareFlowProps> = ({
       return `${intro}
 ${body}${city}${phone}${upi}${note}
 
-👉 *हमारा ऑनलाइन डिजिटल पोस्टर व रेट लिस्ट यहाँ देखें (बिना किसी लॉगिन के):*
-${posterWebLink}
-
 🙏 _आपकी संतुष्टि ही हमारा विश्वास है! धन्यवाद!_`;
     } else {
       // English version
@@ -137,12 +93,9 @@ ${posterWebLink}
       return `${intro}
 ${body}${city}${phone}${upi}${note}
 
-👉 *View our Digital Poster & Store Catalog here:*
-${posterWebLink}
-
 🙏 _Your satisfaction is our pride! Thank you!_`;
     }
-  }, [profile, template, offerType, customNote, posterWebLink, isHindi, customHeader, customQuote]);
+  }, [profile, template, offerType, customNote, isHindi, customHeader, customQuote]);
 
   // Handle Send to WhatsApp
   const handleSendWhatsApp = () => {
@@ -182,58 +135,12 @@ ${posterWebLink}
             </h3>
             <p className="text-xs text-slate-400">
               {isHindi
-                ? 'दुकान का नाम, ऑफर और सार्वजनिक पोस्टर लिंक पहले से तैयार हैं।'
-                : 'Pre-filled with shop name, verified public link, and current offer.'}
+                ? 'दुकान का नाम, ऑफर और संपर्क पहले से तैयार हैं।'
+                : 'Pre-filled with shop name, contact, and current offer.'}
             </p>
           </div>
         </div>
-
-        {/* Public Domain Badge / Switcher */}
-        <button
-          type="button"
-          onClick={() => setShowDomainSettings(!showDomainSettings)}
-          className="text-[11px] text-sky-400 hover:text-sky-300 bg-sky-500/10 border border-sky-500/20 px-2.5 py-1 rounded-xl flex items-center gap-1.5 cursor-pointer"
-        >
-          <Globe className="w-3.5 h-3.5 text-sky-400" />
-          <span>{publicBaseDomain.replace('https://', '')}</span>
-          <span className="text-[10px] text-emerald-400 font-bold">✓ पब्लिक</span>
-        </button>
       </div>
-
-      {/* Domain explanation / settings box */}
-      {showDomainSettings && (
-        <div className="p-3 rounded-2xl bg-slate-950 border border-sky-500/40 text-xs text-slate-300 space-y-2 animate-fadeIn">
-          <div className="flex items-start gap-2">
-            <Info className="w-4 h-4 text-sky-400 shrink-0 mt-0.5" />
-            <div className="space-y-1">
-              <strong className="text-white block font-bold">
-                {isHindi ? 'सार्वजनिक लिंक (Public Link Guarantee):' : 'Public Link Guarantee:'}
-              </strong>
-              <p className="text-[11px] text-slate-400 leading-relaxed">
-                {isHindi
-                  ? 'ais-dev-... वाला लिंक केवल आपके Google खाते से खुलता है। ग्राहकों को भेजने के लिए हम हमेशा DukaanBrand Vercel लिंक का उपयोग करते हैं, जिससे कोई भी ग्राहक बिना किसी पासवर्ड या लॉगिन के तुरंत पोस्टर देख सके!'
-                  : 'The ais-dev link requires your Google login. We use the public Vercel domain so any customer can open your poster without needing any login!'}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 pt-1">
-            <input
-              type="text"
-              value={customDomain}
-              onChange={(e) => setCustomDomain(e.target.value)}
-              placeholder="https://dukaan-brand.vercel.app"
-              className="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-sky-400 font-mono"
-            />
-            <button
-              type="button"
-              onClick={() => setCustomDomain(DEFAULT_PUBLIC_DOMAIN)}
-              className="text-[11px] text-amber-400 hover:underline font-bold px-2"
-            >
-              रीसेट
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* Offer Type Selector Buttons */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">

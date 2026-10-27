@@ -14,6 +14,7 @@ import { SalesTipsCard } from './components/SalesTipsCard';
 import { DailyGoalTracker } from './components/DailyGoalTracker';
 import { WhatsAppShareFlow } from './components/WhatsAppShareFlow';
 import { PosterCustomizer } from './components/PosterCustomizer';
+import { ViralRewardSystem } from './components/ViralRewardSystem';
 import { 
   Sparkles, 
   Crown, 
@@ -28,7 +29,10 @@ import {
   QrCode, 
   CheckCircle2, 
   Zap,
-  Edit3
+  Edit3,
+  Gift,
+  Smartphone,
+  Square
 } from 'lucide-react';
 
 export default function App() {
@@ -78,8 +82,8 @@ export default function App() {
     setCustomAccent('');
   };
 
-  // Mobile navigation tab: 'preview' | 'templates' | 'customize' | 'details' | 'pro'
-  const [mobileTab, setMobileTab] = useState<'preview' | 'templates' | 'customize' | 'details' | 'pro'>('preview');
+  // Mobile navigation tab: 'preview' | 'templates' | 'customize' | 'details' | 'rewards'
+  const [mobileTab, setMobileTab] = useState<'preview' | 'templates' | 'customize' | 'details' | 'rewards'>('preview');
 
   // Sitewide Access Protection State
   const [isSiteUnlocked, setIsSiteUnlocked] = useState<boolean>(() => {
@@ -565,18 +569,7 @@ export default function App() {
       />
 
       {/* Main Container */}
-      <main className="flex-1 max-w-6xl mx-auto px-3 sm:px-6 py-3 sm:py-6 w-full space-y-4">
-        {/* Daily Shop Sales Tip Banner (दुकानदार कमाई टिप) */}
-        <SalesTipsCard shopName={profile.shopName} language={language} />
-
-        {/* Daily Sales & Share Goal Tracker (दुकानदार डेली शेयर लक्ष्य) */}
-        <DailyGoalTracker
-          currentCount={dailyGoalCount}
-          onIncrement={handleIncrementGoal}
-          onReset={handleResetGoal}
-          language={language}
-        />
-
+      <main className="flex-1 max-w-6xl mx-auto px-2.5 sm:px-6 py-2.5 sm:py-6 w-full space-y-3.5">
         {/* Mobile Navigation Tabs (Super clear 5 buttons for mobile shopkeepers) */}
         <div className="block lg:hidden">
           <div className="grid grid-cols-5 gap-1 p-1 bg-slate-900 border border-slate-800 rounded-2xl shadow-lg text-[10px] sm:text-[11px] font-black">
@@ -634,15 +627,15 @@ export default function App() {
 
             <button
               type="button"
-              onClick={() => setMobileTab('pro')}
+              onClick={() => setMobileTab('rewards')}
               className={`py-2 px-1 rounded-xl flex flex-col items-center justify-center gap-1 transition-all ${
-                mobileTab === 'pro'
+                mobileTab === 'rewards'
                   ? 'bg-gradient-to-tr from-amber-500 to-rose-500 text-slate-950 shadow-md font-black'
                   : 'text-amber-400 hover:text-amber-300'
               }`}
             >
-              <Crown className="w-3.5 h-3.5" />
-              <span>{isEn ? '5. VIP Pro' : isHi ? '5. वीआईपी' : '5. VIP Pro'}</span>
+              <Gift className="w-3.5 h-3.5" />
+              <span>{isEn ? '5. Rewards' : isHi ? '5. ₹100 इनाम' : '5. ₹100 Inaam'}</span>
             </button>
           </div>
         </div>
@@ -651,21 +644,51 @@ export default function App() {
         <div className="block lg:hidden">
           {/* Tab 1: Live Poster Preview Screen (Immediate satisfaction!) */}
           {mobileTab === 'preview' && (
-            <div className="space-y-4 animate-fadeIn">
-              <div className="flex items-center justify-between px-1">
-                <span className="text-xs font-black text-amber-300 flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                  <span>
-                    {language === 'english' 
-                      ? 'Live Poster Ready (Created in 10 seconds):' 
-                      : 'लाइव स्टेटस तैयार है (10 सेकंड में बनाएं):'}
-                  </span>
-                </span>
-                <span className="text-[10px] text-emerald-400 font-bold bg-emerald-500/15 px-2 py-0.5 rounded-full border border-emerald-500/30">
-                  ✓ HD Ready
-                </span>
+            <div className="space-y-3.5 animate-fadeIn">
+              {/* Quick Size Toggle directly above poster */}
+              <div className="grid grid-cols-2 gap-2 bg-slate-900/80 p-1.5 rounded-2xl border border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setFormat('story')}
+                  className={`py-2 px-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                    format === 'story'
+                      ? 'bg-amber-500 text-slate-950 shadow-sm'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <Smartphone className="w-3.5 h-3.5" />
+                  <span>{isEn ? 'Status (9:16)' : 'WhatsApp स्टेटस (9:16)'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setFormat('square')}
+                  className={`py-2 px-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                    format === 'square'
+                      ? 'bg-amber-500 text-slate-950 shadow-sm'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <Square className="w-3.5 h-3.5" />
+                  <span>{isEn ? 'Square Post (1:1)' : 'चौकोर पोस्ट / DP (1:1)'}</span>
+                </button>
               </div>
 
+              {/* Compact 1-line Sales Tip Banner */}
+              <div className="px-3 py-2 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-300 text-xs flex items-center justify-between gap-2 shadow-sm">
+                <span className="truncate">
+                  💡 <strong>{isEn ? 'Tip:' : 'कमाई टिप:'}</strong> {isEn ? 'Post every morning at 8 AM on WhatsApp Status for 30% more customer orders!' : 'रोजाना सुबह 8 बजे WhatsApp स्टेटस लगाएं, 30% ग्राहक स्टेटस देखकर ऑर्डर देते हैं!'}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setMobileTab('rewards')}
+                  className="text-amber-400 hover:underline font-bold text-[11px] shrink-0"
+                >
+                  {isEn ? 'Gifts →' : 'इनाम →'}
+                </button>
+              </div>
+
+              {/* Live Canvas Poster Renderer */}
               <CanvasRenderer
                 profile={profile}
                 template={selectedTemplate}
@@ -681,7 +704,28 @@ export default function App() {
                 onShareSuccess={handleIncrementGoal}
               />
 
-              {/* Automated WhatsApp Message Flow (1-Click Share) */}
+              {/* Viral Gift Card Teaser Banner (Direct link to Rewards tab) */}
+              <div
+                onClick={() => setMobileTab('rewards')}
+                className="p-3.5 rounded-2xl bg-gradient-to-r from-amber-950/60 via-slate-900 to-emerald-950/60 border border-amber-500/40 flex items-center justify-between text-xs cursor-pointer active:scale-98 transition-all shadow-lg group"
+              >
+                <div className="flex items-center gap-2.5">
+                  <span className="text-2xl animate-bounce">🎁</span>
+                  <div>
+                    <strong className="text-white block text-xs sm:text-sm">
+                      {isEn ? 'Share with 10 friends & Win ₹100 Gift Voucher!' : '10 दोस्तों को शेयर करें = ₹100 Amazon / Flipkart गिफ्ट!'}
+                    </strong>
+                    <span className="text-[11px] text-amber-300">
+                      {isEn ? 'Scratch card unlocked after shares • Tap to open' : 'डिजिटल स्क्रैच कार्ड खोलें व वाउचर कोड पाएं →'}
+                    </span>
+                  </div>
+                </div>
+                <span className="font-black text-amber-400 bg-amber-500/20 px-2.5 py-1 rounded-xl text-xs shrink-0 group-hover:bg-amber-500 group-hover:text-slate-950 transition-colors">
+                  {isEn ? 'Open →' : 'खोलें →'}
+                </span>
+              </div>
+
+              {/* Automated WhatsApp Message Flow (1-Click Share without link) */}
               <WhatsAppShareFlow
                 profile={profile}
                 template={selectedTemplate}
@@ -692,14 +736,14 @@ export default function App() {
               />
 
               {/* Quick shortcut buttons beneath poster */}
-              <div className="grid grid-cols-3 gap-1.5 pt-2">
+              <div className="grid grid-cols-3 gap-1.5 pt-1">
                 <button
                   type="button"
                   onClick={() => setMobileTab('templates')}
                   className="py-2.5 px-2 rounded-2xl bg-slate-900 border border-slate-800 text-slate-200 hover:text-white font-bold text-[11px] flex items-center justify-center gap-1 shadow"
                 >
                   <Palette className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                  <span>{language === 'english' ? 'Templates' : 'डिज़ाइन →'}</span>
+                  <span>{language === 'english' ? 'Templates' : 'डिज़ाइन बदलें →'}</span>
                 </button>
 
                 <button
@@ -717,7 +761,7 @@ export default function App() {
                   className="py-2.5 px-2 rounded-2xl bg-slate-900 border border-slate-800 text-slate-200 hover:text-white font-bold text-[11px] flex items-center justify-center gap-1 shadow"
                 >
                   <Store className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                  <span>{language === 'english' ? 'Shop Info' : 'दुकान नाम →'}</span>
+                  <span>{language === 'english' ? 'Shop Info' : 'दुकान व लोगो →'}</span>
                 </button>
               </div>
             </div>
@@ -729,14 +773,14 @@ export default function App() {
               <div className="flex items-center justify-between px-1">
                 <span className="text-xs font-black text-white flex items-center gap-1.5">
                   <Palette className="w-4 h-4 text-amber-400" />
-                  <span>आज का सुविचार या त्योहार चुनें:</span>
+                  <span>{isEn ? 'Choose Template or Greeting:' : 'आज का सुविचार या त्योहार चुनें:'}</span>
                 </span>
                 <button
                   type="button"
                   onClick={() => setMobileTab('preview')}
                   className="text-xs text-amber-400 font-bold underline"
                 >
-                  पोस्टर देखें →
+                  {isEn ? 'View Poster →' : 'पोस्टर देखें →'}
                 </button>
               </div>
 
@@ -753,7 +797,7 @@ export default function App() {
             </div>
           )}
 
-          {/* Tab: Customize Poster Words, Quotes & Colors */}
+          {/* Tab 3: Customize Poster Words, Quotes & Colors */}
           {mobileTab === 'customize' && (
             <div className="space-y-3 animate-fadeIn">
               <div className="flex items-center justify-between px-1">
@@ -797,20 +841,20 @@ export default function App() {
             </div>
           )}
 
-          {/* Tab 3: Shop Details Screen */}
+          {/* Tab 4: Shop Details & Logo Upload (HTML5 File API + FileReader Base64) */}
           {mobileTab === 'details' && (
             <div className="space-y-3 animate-fadeIn">
               <div className="flex items-center justify-between px-1">
                 <span className="text-xs font-black text-white flex items-center gap-1.5">
                   <Store className="w-4 h-4 text-emerald-400" />
-                  <span>अपनी दुकान की जानकारी भरें:</span>
+                  <span>{isEn ? 'Shop Details & Logo Upload:' : 'दुकान की जानकारी व लोगो फोटो:'}</span>
                 </span>
                 <button
                   type="button"
                   onClick={() => setMobileTab('preview')}
                   className="text-xs text-amber-400 font-bold underline"
                 >
-                  पोस्टर देखें →
+                  {isEn ? 'View Poster →' : 'पोस्टर देखें →'}
                 </button>
               </div>
 
@@ -829,60 +873,34 @@ export default function App() {
                 onClick={() => setMobileTab('preview')}
                 className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black text-sm shadow-lg active:scale-95 transition-all"
               >
-                ✓ तैयार! पोस्टर देखें व स्टेटस लगाएं →
+                {isEn ? '✓ Done! View Poster & Share →' : '✓ तैयार! पोस्टर देखें व स्टेटस लगाएं →'}
               </button>
             </div>
           )}
 
-          {/* Tab 4: VIP Pro Jugad Perks Screen */}
-          {mobileTab === 'pro' && (
-            <div className="space-y-3 animate-fadeIn">
-              <div className="bg-slate-900 border border-amber-500/40 rounded-3xl p-5 text-white shadow-xl space-y-4">
-                <div className="text-center">
-                  <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto mb-2 font-black text-xl">
-                    👑
-                  </div>
-                  <h3 className="font-black text-lg text-white">
-                    VIP Pro से दुकान की बिक्री बढ़ाएं
-                  </h3>
-                  <p className="text-xs text-slate-300 mt-1">
-                    सिर्फ वॉटरमार्क हटाना नहीं — ग्राहक पोस्टर देखकर सीधे पैसे भेजेंगे!
-                  </p>
-                </div>
+          {/* Tab 5: Viral Share & ₹100 Gift Voucher System */}
+          {mobileTab === 'rewards' && (
+            <div className="space-y-4 animate-fadeIn">
+              <ViralRewardSystem
+                shareCount={dailyGoalCount}
+                onShareIncrement={handleIncrementGoal}
+                onUnlockProFree={() => setIsPro(true)}
+                isPro={isPro}
+                language={language}
+                shopName={profile.shopName}
+                phone={profile.phone}
+              />
 
-                <div className="space-y-2.5 text-xs">
-                  <div className="p-3 rounded-2xl bg-slate-950 border border-slate-800 flex items-center gap-3">
-                    <QrCode className="w-5 h-5 text-amber-400 shrink-0" />
-                    <div>
-                      <strong className="block text-white">पोस्टर पर असली UPI QR कोड</strong>
-                      <span className="text-[11px] text-slate-400">ग्राहक स्कैन करके सीधे खाते में पेमेंट भेजेंगे।</span>
-                    </div>
-                  </div>
+              {/* Extra Tools for Shop Growth inside Rewards */}
+              <div className="space-y-3 pt-2">
+                <DailyGoalTracker
+                  currentCount={dailyGoalCount}
+                  onIncrement={handleIncrementGoal}
+                  onReset={handleResetGoal}
+                  language={language}
+                />
 
-                  <div className="p-3 rounded-2xl bg-slate-950 border border-slate-800 flex items-center gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
-                    <div>
-                      <strong className="block text-white">गोल्डन 'Verified Dukaan' बैज</strong>
-                      <span className="text-[11px] text-slate-400">100% शुद्धता व पक्का बिल का भरोसा स्टैम्प।</span>
-                    </div>
-                  </div>
-
-                  <div className="p-3 rounded-2xl bg-slate-950 border border-slate-800 flex items-center gap-3">
-                    <Sparkles className="w-5 h-5 text-rose-400 shrink-0" />
-                    <div>
-                      <strong className="block text-white">दुकान की फोटो + महासेल ऑफर</strong>
-                      <span className="text-[11px] text-slate-400">20% छूट या फ्री होम डिलीवरी का चमकदार बैनर।</span>
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => setIsProModalOpen(true)}
-                  className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-slate-950 font-black text-sm shadow-xl active:scale-95 transition-all"
-                >
-                  सिर्फ ₹{adminConfig.monthlyPrice} में अभी अनलॉक करें →
-                </button>
+                <SalesTipsCard shopName={profile.shopName} language={language} />
               </div>
             </div>
           )}
@@ -993,6 +1011,17 @@ export default function App() {
               customHeader={customHeader}
               customQuote={customQuote}
               onShareSuccess={handleIncrementGoal}
+            />
+
+            {/* Viral Reward System (Scratch card & ₹100 Gift Voucher) */}
+            <ViralRewardSystem
+              shareCount={dailyGoalCount}
+              onShareIncrement={handleIncrementGoal}
+              onUnlockProFree={() => setIsPro(true)}
+              isPro={isPro}
+              language={language}
+              shopName={profile.shopName}
+              phone={profile.phone}
             />
           </div>
         </div>
