@@ -54,14 +54,16 @@ export const DukaanHeader: React.FC<DukaanHeaderProps> = ({
             <div>
               <div className="flex items-center gap-1.5">
                 <h1 className="font-black text-base sm:text-lg tracking-tight text-white">
-                  दुकान ब्रांड
+                  {language === 'english' ? 'DukaanBrand' : 'दुकान ब्रांड'}
                 </h1>
                 <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                  पोस्टर मेकर
+                  {language === 'english' ? 'Poster Maker' : 'पोस्टर मेकर'}
                 </span>
               </div>
               <p className="text-[11px] text-slate-400 hidden sm:block">
-                अपनी दुकान का नाम व मोबाइल नंबर वाला WhatsApp स्टेटस 10 सेकंड में बनाएं
+                {language === 'english'
+                  ? 'Create WhatsApp status posters for your shop in 10 seconds'
+                  : 'अपनी दुकान का नाम व मोबाइल नंबर वाला WhatsApp स्टेटस 10 सेकंड में बनाएं'}
               </p>
             </div>
           </div>

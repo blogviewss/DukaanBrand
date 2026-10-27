@@ -46,16 +46,25 @@ export const WhatsAppShareFlow: React.FC<WhatsAppShareFlowProps> = ({
 
   const isHindi = language === 'hinglish';
 
-  // Smart domain resolver: replaces private ais-dev-* or localhost with the public production domain
+  // Smart domain resolver: guarantees outside customers open public Vercel app without Google sign-in
   const publicBaseDomain = useMemo(() => {
-    if (customDomain.trim()) return customDomain.trim().replace(/\/$/, '');
+    // If running in production browser on Vercel or custom domain (not an internal dev container)
     if (typeof window !== 'undefined') {
       const origin = window.location.origin;
-      // If dev instance (Google login required), fallback to public Vercel domain
-      if (origin.includes('ais-dev-') || origin.includes('localhost') || origin.includes('127.0.0.1')) {
-        return DEFAULT_PUBLIC_DOMAIN;
+      const isInternalDev = 
+        origin.includes('ais-dev') || 
+        origin.includes('run.app') || 
+        origin.includes('localhost') || 
+        origin.includes('127.0.0.1') || 
+        origin.includes('google.com') ||
+        origin.includes('aistudio');
+      
+      if (!isInternalDev && origin.startsWith('http')) {
+        return origin;
       }
-      return origin;
+    }
+    if (customDomain.trim() && !customDomain.includes('run.app') && !customDomain.includes('ais-dev')) {
+      return customDomain.trim().replace(/\/$/, '');
     }
     return DEFAULT_PUBLIC_DOMAIN;
   }, [customDomain]);

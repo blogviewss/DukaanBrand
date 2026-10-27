@@ -3,9 +3,10 @@ import { Lightbulb, Sparkles, RefreshCw, TrendingUp } from 'lucide-react';
 
 interface SalesTipsCardProps {
   shopName?: string;
+  language?: 'hinglish' | 'english';
 }
 
-const SALES_TIPS = [
+const SALES_TIPS_HINDI = [
   {
     category: 'WhatsApp ट्रिक',
     tip: 'रोजाना सुबह 8 बजे WhatsApp स्टेटस पर "सुप्रभात + आज का स्पेशल ऑफर" लगाएं, 30% ग्राहक स्टेटस देखकर सीधे ऑर्डर देते हैं।',
@@ -48,19 +49,64 @@ const SALES_TIPS = [
   },
 ];
 
-export const SalesTipsCard: React.FC<SalesTipsCardProps> = () => {
+const SALES_TIPS_ENGLISH = [
+  {
+    category: 'WhatsApp Trick',
+    tip: 'Post a "Good Morning + Today Special Offer" status at 8 AM daily; 30% of customers order directly upon viewing!',
+  },
+  {
+    category: 'Counter Setup',
+    tip: 'Keep your store QR code and a "Free Home Delivery" board on counter so neighborhood families order easily via WhatsApp.',
+  },
+  {
+    category: 'Customer Loyalty',
+    tip: 'Offer a complimentary small treat or discount on purchases above ₹500 to turn one-time buyers into loyal regulars.',
+  },
+  {
+    category: 'Festival Rush',
+    tip: 'Send personalized festival greetings with your branded poster 3 days early to double your seasonal sales volume.',
+  },
+  {
+    category: 'Display Trick',
+    tip: 'Showcase popular daily-need items near store entrance to catch immediate shopper attention and boost walk-in orders.',
+  },
+  {
+    category: 'No-Credit Trick',
+    tip: 'Politely inform customers: "Pay via UPI today and enjoy an instant ₹10 cash discount on your total bill".',
+  },
+  {
+    category: 'New Stock Alert',
+    tip: 'Whenever fresh inventory arrives, share a 10-second branded status to sell out half the stock before evening.',
+  },
+  {
+    category: 'Sunday Combo',
+    tip: 'Promote bundle packs on Sunday afternoons (e.g. Tea + Sugar + Snacks) at bundled savings to clear inventory.',
+  },
+  {
+    category: 'Customer Group',
+    tip: 'Save customer phone numbers to a WhatsApp Broadcast list and send updates twice a week for consistent footfall.',
+  },
+  {
+    category: 'Store Ambience',
+    tip: 'Maintain clean shelves and gentle background music so shoppers enjoy browsing longer and buy more.',
+  },
+];
+
+export const SalesTipsCard: React.FC<SalesTipsCardProps> = ({ language = 'hinglish' }) => {
   const [currentTipIndex, setCurrentTipIndex] = useState(0);
   const [isRotating, setIsRotating] = useState(false);
+
+  const tips = language === 'english' ? SALES_TIPS_ENGLISH : SALES_TIPS_HINDI;
 
   const nextTip = () => {
     setIsRotating(true);
     setTimeout(() => {
-      setCurrentTipIndex((prev) => (prev + 1) % SALES_TIPS.length);
+      setCurrentTipIndex((prev) => (prev + 1) % tips.length);
       setIsRotating(false);
     }, 150);
   };
 
-  const current = SALES_TIPS[currentTipIndex];
+  const current = tips[currentTipIndex];
 
   return (
     <div className="bg-gradient-to-r from-amber-950/40 via-slate-900 to-emerald-950/40 border border-amber-500/30 rounded-2xl p-3 sm:p-4 shadow-lg backdrop-blur-sm transition-all hover:border-amber-500/50">
@@ -72,7 +118,7 @@ export const SalesTipsCard: React.FC<SalesTipsCardProps> = () => {
           <div>
             <div className="flex items-center gap-2">
               <span className="text-[11px] font-black uppercase tracking-wider text-amber-400">
-                दुकानदार कमाई टिप #{currentTipIndex + 1}
+                {language === 'english' ? `Store Sales Tip #${currentTipIndex + 1}` : `दुकानदार कमाई टिप #${currentTipIndex + 1}`}
               </span>
               <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full font-bold border border-emerald-500/30">
                 {current.category}
@@ -88,24 +134,24 @@ export const SalesTipsCard: React.FC<SalesTipsCardProps> = () => {
           type="button"
           onClick={nextTip}
           className="shrink-0 flex items-center gap-1 text-[11px] font-black text-amber-400 hover:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 px-2.5 py-1.5 rounded-xl border border-amber-500/30 transition-all cursor-pointer active:scale-95"
-          title="अगला टिप देखें"
+          title={language === 'english' ? 'View Next Tip' : 'अगला टिप देखें'}
         >
           <RefreshCw className={`w-3 h-3 ${isRotating ? 'animate-spin' : ''}`} />
-          <span className="hidden sm:inline">अगला टिप</span>
+          <span className="hidden sm:inline">{language === 'english' ? 'Next Tip' : 'अगला टिप'}</span>
         </button>
       </div>
 
       <div className="mt-2 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
         <span className="flex items-center gap-1 text-slate-400">
           <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
-          <span>इस टिप को अपनी दुकान में आज ही आजमाएं</span>
+          <span>{language === 'english' ? 'Try this actionable tip at your shop today' : 'इस टिप को अपनी दुकान में आज ही आजमाएं'}</span>
         </span>
         <button
           type="button"
           onClick={nextTip}
           className="text-amber-400/80 hover:text-amber-300 underline font-semibold text-[10px] sm:hidden"
         >
-          बदलें (Next) →
+          {language === 'english' ? 'Next Tip →' : 'बदलें (Next) →'}
         </button>
       </div>
     </div>

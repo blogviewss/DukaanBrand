@@ -280,6 +280,18 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
           </button>
 
           <button
+            onClick={() => setActiveTab('profit_calculator')}
+            className={`px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 ${
+              activeTab === 'profit_calculator'
+                ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 shadow-md font-black'
+                : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
+            }`}
+          >
+            <TrendingUp className="w-4 h-4 text-emerald-400" />
+            <span>प्रॉफिट व कमाई कैलकुलेटर (Profit Tool)</span>
+          </button>
+
+          <button
             onClick={() => setActiveTab('upi')}
             className={`px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-1.5 shrink-0 ${
               activeTab === 'upi'
@@ -343,6 +355,14 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
         {/* TAB 1: ANALYTICS (Recharts Interactive Visualizations) */}
         {activeTab === 'analytics' && (
           <AdminAnalytics />
+        )}
+
+        {/* TAB: PROFIT POTENTIAL CALCULATOR */}
+        {activeTab === 'profit_calculator' && (
+          <ProfitPotentialCalculator
+            currentMonthlyPrice={config.monthlyPrice}
+            currentActiveSubscribers={activeSubscribers.length}
+          />
         )}
 
         {/* TAB 2: OWNER UPI SETTINGS */}
@@ -573,13 +593,25 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                 </span>
               </div>
 
-              <button
-                onClick={() => setShowAddModal(true)}
-                className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors shadow-sm self-start sm:self-auto"
-              >
-                <Plus className="w-4 h-4" />
-                <span>नया VIP मेंबर जोड़ें</span>
-              </button>
+              <div className="flex items-center gap-2 flex-wrap">
+                <button
+                  type="button"
+                  onClick={() => setShowBroadcastModal(true)}
+                  className="px-3.5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors shadow-sm"
+                  title="CSV Export & WhatsApp Broadcast"
+                >
+                  <FileSpreadsheet className="w-4 h-4" />
+                  <span>📢 CSV व WhatsApp ब्रॉडकास्ट ({payments.length})</span>
+                </button>
+
+                <button
+                  onClick={() => setShowAddModal(true)}
+                  className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors shadow-sm self-start sm:self-auto"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>नया VIP मेंबर जोड़ें</span>
+                </button>
+              </div>
             </div>
 
             {/* List */}
@@ -926,6 +958,12 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
           </div>
         </div>
       )}
+      {/* Broadcast & CSV Export Modal */}
+      <BroadcastExportModal
+        isOpen={showBroadcastModal}
+        onClose={() => setShowBroadcastModal(false)}
+        subscribers={payments}
+      />
     </div>
   );
 };

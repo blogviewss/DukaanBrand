@@ -13,6 +13,7 @@ import { SiteAccessGatekeeper } from './components/SiteAccessGatekeeper';
 import { SalesTipsCard } from './components/SalesTipsCard';
 import { DailyGoalTracker } from './components/DailyGoalTracker';
 import { WhatsAppShareFlow } from './components/WhatsAppShareFlow';
+import { PosterCustomizer } from './components/PosterCustomizer';
 import { 
   Sparkles, 
   Crown, 
@@ -26,7 +27,8 @@ import {
   Download, 
   QrCode, 
   CheckCircle2, 
-  Zap 
+  Zap,
+  Edit3
 } from 'lucide-react';
 
 export default function App() {
@@ -37,8 +39,28 @@ export default function App() {
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>('all');
   const [selectedTemplate, setSelectedTemplate] = useState<Template>(TEMPLATES_DATA[0]);
 
-  // Mobile navigation tab: 'preview' | 'templates' | 'details' | 'pro'
-  const [mobileTab, setMobileTab] = useState<'preview' | 'templates' | 'details' | 'pro'>('preview');
+  // Poster Customization State (Allows editing headers, quotes, subquotes, and accent colors)
+  const [customHeader, setCustomHeader] = useState<string>('');
+  const [customQuote, setCustomQuote] = useState<string>('');
+  const [customSubQuote, setCustomSubQuote] = useState<string>('');
+  const [customAccent, setCustomAccent] = useState<string>('');
+
+  const handleCustomizerUpdate = (field: 'header' | 'quote' | 'subQuote' | 'accent', value: string) => {
+    if (field === 'header') setCustomHeader(value);
+    if (field === 'quote') setCustomQuote(value);
+    if (field === 'subQuote') setCustomSubQuote(value);
+    if (field === 'accent') setCustomAccent(value);
+  };
+
+  const handleCustomizerReset = () => {
+    setCustomHeader('');
+    setCustomQuote('');
+    setCustomSubQuote('');
+    setCustomAccent('');
+  };
+
+  // Mobile navigation tab: 'preview' | 'templates' | 'customize' | 'details' | 'pro'
+  const [mobileTab, setMobileTab] = useState<'preview' | 'templates' | 'customize' | 'details' | 'pro'>('preview');
 
   // Sitewide Access Protection State
   const [isSiteUnlocked, setIsSiteUnlocked] = useState<boolean>(() => {
@@ -526,68 +548,82 @@ export default function App() {
       {/* Main Container */}
       <main className="flex-1 max-w-6xl mx-auto px-3 sm:px-6 py-3 sm:py-6 w-full space-y-4">
         {/* Daily Shop Sales Tip Banner (दुकानदार कमाई टिप) */}
-        <SalesTipsCard shopName={profile.shopName} />
+        <SalesTipsCard shopName={profile.shopName} language={language} />
 
         {/* Daily Sales & Share Goal Tracker (दुकानदार डेली शेयर लक्ष्य) */}
         <DailyGoalTracker
           currentCount={dailyGoalCount}
           onIncrement={handleIncrementGoal}
           onReset={handleResetGoal}
+          language={language}
         />
 
-        {/* Mobile Navigation Tabs (Super clear 4 buttons for illiterate/ordinary users) */}
+        {/* Mobile Navigation Tabs (Super clear 5 buttons for mobile shopkeepers) */}
         <div className="block lg:hidden">
-          <div className="grid grid-cols-4 gap-1 p-1 bg-slate-900 border border-slate-800 rounded-2xl shadow-lg text-[11px] font-black">
+          <div className="grid grid-cols-5 gap-1 p-1 bg-slate-900 border border-slate-800 rounded-2xl shadow-lg text-[10px] sm:text-[11px] font-black">
             <button
               type="button"
               onClick={() => setMobileTab('preview')}
-              className={`py-2.5 px-1 rounded-xl flex flex-col items-center justify-center gap-1 transition-all ${
+              className={`py-2 px-1 rounded-xl flex flex-col items-center justify-center gap-1 transition-all ${
                 mobileTab === 'preview'
                   ? 'bg-amber-500 text-slate-950 shadow-md font-black'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              <Eye className="w-4 h-4" />
-              <span>1. पोस्टर</span>
+              <Eye className="w-3.5 h-3.5" />
+              <span>{language === 'english' ? '1. Poster' : '1. पोस्टर'}</span>
             </button>
 
             <button
               type="button"
               onClick={() => setMobileTab('templates')}
-              className={`py-2.5 px-1 rounded-xl flex flex-col items-center justify-center gap-1 transition-all ${
+              className={`py-2 px-1 rounded-xl flex flex-col items-center justify-center gap-1 transition-all ${
                 mobileTab === 'templates'
                   ? 'bg-amber-500 text-slate-950 shadow-md font-black'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              <Palette className="w-4 h-4" />
-              <span>2. डिज़ाइन</span>
+              <Palette className="w-3.5 h-3.5" />
+              <span>{language === 'english' ? '2. Design' : '2. डिज़ाइन'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setMobileTab('customize')}
+              className={`py-2 px-1 rounded-xl flex flex-col items-center justify-center gap-1 transition-all ${
+                mobileTab === 'customize'
+                  ? 'bg-amber-500 text-slate-950 shadow-md font-black'
+                  : 'text-amber-400 hover:text-white'
+              }`}
+            >
+              <Edit3 className="w-3.5 h-3.5" />
+              <span>{language === 'english' ? '3. Text' : '3. शब्द'}</span>
             </button>
 
             <button
               type="button"
               onClick={() => setMobileTab('details')}
-              className={`py-2.5 px-1 rounded-xl flex flex-col items-center justify-center gap-1 transition-all ${
+              className={`py-2 px-1 rounded-xl flex flex-col items-center justify-center gap-1 transition-all ${
                 mobileTab === 'details'
                   ? 'bg-amber-500 text-slate-950 shadow-md font-black'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              <Store className="w-4 h-4" />
-              <span>3. दुकान नाम</span>
+              <Store className="w-3.5 h-3.5" />
+              <span>{language === 'english' ? '4. Store' : '4. दुकान'}</span>
             </button>
 
             <button
               type="button"
               onClick={() => setMobileTab('pro')}
-              className={`py-2.5 px-1 rounded-xl flex flex-col items-center justify-center gap-1 transition-all ${
+              className={`py-2 px-1 rounded-xl flex flex-col items-center justify-center gap-1 transition-all ${
                 mobileTab === 'pro'
                   ? 'bg-gradient-to-tr from-amber-500 to-rose-500 text-slate-950 shadow-md font-black'
                   : 'text-amber-400 hover:text-amber-300'
               }`}
             >
-              <Crown className="w-4 h-4" />
-              <span>4. VIP फीचर्स</span>
+              <Crown className="w-3.5 h-3.5" />
+              <span>{language === 'english' ? '5. VIP' : '5. VIP'}</span>
             </button>
           </div>
         </div>
@@ -600,7 +636,11 @@ export default function App() {
               <div className="flex items-center justify-between px-1">
                 <span className="text-xs font-black text-amber-300 flex items-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                  <span>लाइव स्टेटस तैयार है (10 सेकंड में बनाएं):</span>
+                  <span>
+                    {language === 'english' 
+                      ? 'Live Poster Ready (Created in 10 seconds):' 
+                      : 'लाइव स्टेटस तैयार है (10 सेकंड में बनाएं):'}
+                  </span>
                 </span>
                 <span className="text-[10px] text-emerald-400 font-bold bg-emerald-500/15 px-2 py-0.5 rounded-full border border-emerald-500/30">
                   ✓ HD Ready
@@ -614,6 +654,10 @@ export default function App() {
                 isPro={isPro}
                 watermarkText={adminConfig.watermarkText}
                 language={language}
+                customHeader={customHeader}
+                customQuote={customQuote}
+                customSubQuote={customSubQuote}
+                customAccent={customAccent}
                 onOpenProModal={() => setIsProModalOpen(true)}
                 onShareSuccess={handleIncrementGoal}
               />
@@ -622,27 +666,39 @@ export default function App() {
               <WhatsAppShareFlow
                 profile={profile}
                 template={selectedTemplate}
+                language={language}
+                customHeader={customHeader}
+                customQuote={customQuote}
                 onShareSuccess={handleIncrementGoal}
               />
 
               {/* Quick shortcut buttons beneath poster */}
-              <div className="grid grid-cols-2 gap-2 pt-2">
+              <div className="grid grid-cols-3 gap-1.5 pt-2">
                 <button
                   type="button"
                   onClick={() => setMobileTab('templates')}
-                  className="py-3 px-3 rounded-2xl bg-slate-900 border border-slate-800 text-slate-200 hover:text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow"
+                  className="py-2.5 px-2 rounded-2xl bg-slate-900 border border-slate-800 text-slate-200 hover:text-white font-bold text-[11px] flex items-center justify-center gap-1 shadow"
                 >
-                  <Palette className="w-4 h-4 text-amber-400" />
-                  <span>डिज़ाइन बदलें →</span>
+                  <Palette className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <span>{language === 'english' ? 'Templates' : 'डिज़ाइन →'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setMobileTab('customize')}
+                  className="py-2.5 px-2 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300 hover:text-white font-bold text-[11px] flex items-center justify-center gap-1 shadow"
+                >
+                  <Edit3 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <span>{language === 'english' ? 'Edit Words' : 'कस्टमाइज़ →'}</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setMobileTab('details')}
-                  className="py-3 px-3 rounded-2xl bg-slate-900 border border-slate-800 text-slate-200 hover:text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow"
+                  className="py-2.5 px-2 rounded-2xl bg-slate-900 border border-slate-800 text-slate-200 hover:text-white font-bold text-[11px] flex items-center justify-center gap-1 shadow"
                 >
-                  <Store className="w-4 h-4 text-emerald-400" />
-                  <span>दुकान नाम बदलें →</span>
+                  <Store className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span>{language === 'english' ? 'Shop Info' : 'दुकान नाम →'}</span>
                 </button>
               </div>
             </div>
@@ -675,6 +731,50 @@ export default function App() {
                 activeCategory={activeCategory}
                 onCategoryChange={setActiveCategory}
               />
+            </div>
+          )}
+
+          {/* Tab: Customize Poster Words, Quotes & Colors */}
+          {mobileTab === 'customize' && (
+            <div className="space-y-3 animate-fadeIn">
+              <div className="flex items-center justify-between px-1">
+                <span className="text-xs font-black text-white flex items-center gap-1.5">
+                  <Edit3 className="w-4 h-4 text-amber-400" />
+                  <span>
+                    {language === 'english'
+                      ? 'Customize Poster Text & Colors:'
+                      : 'पोस्टर पर अपनी बात व रंग लिखें:'}
+                  </span>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setMobileTab('preview')}
+                  className="text-xs text-amber-400 font-bold underline cursor-pointer"
+                >
+                  {language === 'english' ? 'View Poster →' : 'पोस्टर देखें →'}
+                </button>
+              </div>
+
+              <PosterCustomizer
+                template={selectedTemplate}
+                customHeader={customHeader}
+                customQuote={customQuote}
+                customSubQuote={customSubQuote}
+                customAccent={customAccent}
+                language={language}
+                onUpdate={handleCustomizerUpdate}
+                onReset={handleCustomizerReset}
+              />
+
+              <button
+                type="button"
+                onClick={() => setMobileTab('preview')}
+                className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-sm shadow-lg active:scale-95 transition-all cursor-pointer"
+              >
+                {language === 'english'
+                  ? '✓ Done! View Live Poster & Share →'
+                  : '✓ तैयार! लाइव पोस्टर देखें व शेयर करें →'}
+              </button>
             </div>
           )}
 
@@ -812,6 +912,27 @@ export default function App() {
                 onCategoryChange={setActiveCategory}
               />
             </section>
+            {/* Step 3: Customize Text, Quotes & Colors */}
+            <section className="space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="w-7 h-7 rounded-full bg-amber-500 text-slate-950 font-black text-xs flex items-center justify-center">
+                  3
+                </span>
+                <h3 className="font-extrabold text-base text-white">
+                  {language === 'english' ? 'Customize Poster Words & Accent Color' : 'पोस्टर कस्टमाइज़ करें (अपनी मर्जी से लिखें)'}
+                </h3>
+              </div>
+              <PosterCustomizer
+                template={selectedTemplate}
+                customHeader={customHeader}
+                customQuote={customQuote}
+                customSubQuote={customSubQuote}
+                customAccent={customAccent}
+                language={language}
+                onUpdate={handleCustomizerUpdate}
+                onReset={handleCustomizerReset}
+              />
+            </section>
           </div>
 
           {/* Right Column (Canvas Preview & Export - 6 cols) */}
@@ -819,10 +940,10 @@ export default function App() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="w-7 h-7 rounded-full bg-emerald-500 text-slate-950 font-black text-xs flex items-center justify-center">
-                  3
+                  4
                 </span>
                 <h3 className="font-extrabold text-base text-white">
-                  लाइव पोस्टर प्रिव्यू व डाउनलोड
+                  {language === 'english' ? 'Live Poster Preview & Download' : 'लाइव पोस्टर प्रिव्यू व डाउनलोड'}
                 </h3>
               </div>
               <span className="text-xs text-emerald-400 font-bold bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
@@ -837,6 +958,10 @@ export default function App() {
               isPro={isPro}
               watermarkText={adminConfig.watermarkText}
               language={language}
+              customHeader={customHeader}
+              customQuote={customQuote}
+              customSubQuote={customSubQuote}
+              customAccent={customAccent}
               onOpenProModal={() => setIsProModalOpen(true)}
               onShareSuccess={handleIncrementGoal}
             />
@@ -845,6 +970,9 @@ export default function App() {
             <WhatsAppShareFlow
               profile={profile}
               template={selectedTemplate}
+              language={language}
+              customHeader={customHeader}
+              customQuote={customQuote}
               onShareSuccess={handleIncrementGoal}
             />
           </div>
